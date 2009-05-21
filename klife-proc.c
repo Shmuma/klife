@@ -7,7 +7,8 @@
 static struct proc_dir_entry *root;
 
 
-static int proc_version_read (char *page, char **start, off_t off, int count, int *eof, void *data);
+static int proc_version_read (char *page, char **start, off_t off, 
+			      int count, int *eof, void *data);
 
 
 int proc_register ()
