@@ -63,8 +63,8 @@ int proc_register (struct klife_status *klife)
 
 int proc_free ()
 {
-	remove_proc_entry (KLIFE_PROC_CREATE, root);
-	remove_proc_entry (KLIFE_PROC_DESTROY, root);
+	remove_proc_entry (KLIFE_PROC_CREATE, boards);
+	remove_proc_entry (KLIFE_PROC_DESTROY, boards);
 	remove_proc_entry (KLIFE_PROC_BOARDS, root);
 	remove_proc_entry (KLIFE_PROC_VERSION, root);
 	remove_proc_entry (KLIFE_PROC_STATUS, root);
@@ -105,7 +105,10 @@ static int proc_status_read (char *page, char **start, off_t off,
 	int len;
 	struct klife_status *klife = data;
 
+	spin_lock (&klife->lock);
 	len = sprintf (page, "Boards: %d\nRunning: %d\nTotal ticks: %llu\n", klife->boards_count, klife->boards_running, klife->ticks);
+	spin_unlock (&klife->lock);
+
 	return proc_calc_metrics (page, start, off, count, eof, len);
 }
 

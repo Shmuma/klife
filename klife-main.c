@@ -10,6 +10,7 @@ struct klife_status klife;
 
 static int klife_init (void)
 {
+	klife.lock = SPIN_LOCK_UNLOCKED;
 	klife.boards_count = 0;
 	klife.boards_running = 0;
 	klife.ticks = 0UL;
