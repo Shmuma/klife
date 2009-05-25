@@ -117,28 +117,34 @@ static int proc_status_read (char *page, char **start, off_t off,
 static int proc_create_write (struct file *file, const char __user *buffer,
 			      unsigned long count, void *data)
 {
-	size_t len = strnlen_user (buffer, count);
+	size_t len;
 	char* name = NULL;
 
-	if (!len) {
+	if (!count) {
 		printk (KERN_WARNING "Error creating board, name is invalid\n");
 		return -EINVAL;
 	}
 
 	/* copy board's name */
-	name = kmalloc (len, GFP_KERNEL);
+	name = kmalloc (count+1, GFP_KERNEL);
 	if (!name)
 		return -ENOMEM;
 
 	/* initialize new board */
-	if (strncpy_from_user (name, buffer, len) < 0) {
+	len = count;
+	len -= copy_from_user (name, buffer, count);
+	if (len <= 0) {
 		kfree (name);
 		return -EINVAL;
 	}
 
+	while (len > 0 && name[len-1] == '\n')
+		len--;
+	name[len] = 0;
 	printk (KERN_INFO "Create new board with name '%s'\n", name);
+	if (!klife_create_board (name))
+		kfree (name);
 
-	kfree (name);
 	return count;
 }
 

@@ -23,8 +23,12 @@ struct klife_status {
 struct klife_board {
 	spinlock_t lock;
 	struct list_head next;
+	int index;
 	char* name;
 };
+
+
+int klife_create_board (char *name);
 
 
 #endif
