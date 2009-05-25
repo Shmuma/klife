@@ -30,5 +30,6 @@ struct klife_board {
 
 int klife_create_board (char *name);
 
+extern struct klife_status klife;
 
 #endif
