@@ -7,7 +7,7 @@
 #define KLIFE_VER_MINOR 1
 
 
-typedef struct klife_status {
+struct klife_status {
 	int boards_count;
 	int boards_running;
 	unsigned long long ticks;
