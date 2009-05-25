@@ -8,11 +8,22 @@
 #define KLIFE_VER_MINOR 1
 
 
+struct klife_board;
+
+
 struct klife_status {
 	spinlock_t lock;
 	int boards_count;
 	int boards_running;
 	unsigned long long ticks;
+	struct klife_board *boards;	/* linked list */
+};
+
+
+struct klife_board {
+	spinlock_t lock;
+	struct list_head next;
+	char* name;
 };
 
 

@@ -14,6 +14,7 @@ static int klife_init (void)
 	klife.boards_count = 0;
 	klife.boards_running = 0;
 	klife.ticks = 0UL;
+	klife.boards = NULL;
 
 #ifdef CONFIG_PROC_FS
 	if (proc_register (&klife)) {

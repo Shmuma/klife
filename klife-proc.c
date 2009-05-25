@@ -1,5 +1,6 @@
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
+#include <linux/uaccess.h>
 
 #include "klife.h"
 #include "klife-proc.h"
@@ -116,12 +117,34 @@ static int proc_status_read (char *page, char **start, off_t off,
 static int proc_create_write (struct file *file, const char __user *buffer,
 			      unsigned long count, void *data)
 {
-	return 0;
+	size_t len = strnlen_user (buffer, count);
+	char* name = NULL;
+
+	if (!len) {
+		printk (KERN_WARNING "Error creating board, name is invalid\n");
+		return -EINVAL;
+	}
+
+	/* copy board's name */
+	name = kmalloc (len, GFP_KERNEL);
+	if (!name)
+		return -ENOMEM;
+
+	/* initialize new board */
+	if (strncpy_from_user (name, buffer, len) < 0) {
+		kfree (name);
+		return -EINVAL;
+	}
+
+	printk (KERN_INFO "Create new board with name '%s'\n", name);
+
+	kfree (name);
+	return count;
 }
 
 
 static int proc_destroy_write (struct file *file, const char __user *buffer,
 			      unsigned long count, void *data)
 {
-	return 0;
+	return count;
 }
