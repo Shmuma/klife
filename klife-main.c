@@ -1,13 +1,21 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 
+#include "klife.h"
 #include "klife-proc.h"
+
+
+struct klife_status klife;
 
 
 static int klife_init (void)
 {
+	klife.boards_count = 0;
+	klife.boards_running = 0;
+	klife.ticks = 0UL;
+
 #ifdef CONFIG_PROC_FS
-	if (proc_register ()) {
+	if (proc_register (&klife)) {
 		printk (KERN_WARNING "klife module failed to initialize /proc interface\n");
 		return 1;
 	}
