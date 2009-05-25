@@ -1,6 +1,7 @@
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
 #include <linux/uaccess.h>
+#include <linux/string.h>
 
 #include "klife.h"
 #include "klife-proc.h"
@@ -20,6 +21,14 @@ static int proc_create_write (struct file *file, const char __user *buffer,
 
 static int proc_destroy_write (struct file *file, const char __user *buffer,
 			      unsigned long count, void *data);
+
+/* board read functions */
+static int proc_board_name_read (char *page, char **start, off_t off,
+				 int count, int *eof, void *data);
+
+
+/* Utility functions */
+static char* get_board_index_str (struct klife_board *board);
 
 
 int proc_register (struct klife_status *klife)
@@ -119,6 +128,7 @@ static int proc_create_write (struct file *file, const char __user *buffer,
 {
 	size_t len;
 	char* name = NULL;
+	int ret;
 
 	if (!count) {
 		printk (KERN_WARNING "Error creating board, name is invalid\n");
@@ -142,10 +152,12 @@ static int proc_create_write (struct file *file, const char __user *buffer,
 		len--;
 	name[len] = 0;
 	printk (KERN_INFO "Create new board with name '%s'\n", name);
-	if (!klife_create_board (name))
+	ret = klife_create_board (name);
+	if (ret)
 		kfree (name);
-
-	return count;
+	else
+		ret = count;
+	return ret;
 }
 
 
@@ -153,4 +165,84 @@ static int proc_destroy_write (struct file *file, const char __user *buffer,
 			      unsigned long count, void *data)
 {
 	return count;
+}
+
+
+int proc_create_board (struct klife_board *board)
+{
+	char *name;
+
+	BUG_ON (!board);
+	spin_lock (&board->lock);
+
+	name = get_board_index_str (board);
+	if (unlikely (!name))
+		goto err;
+
+	board->proc_entry = proc_mkdir (name, boards);
+	kfree (name);
+
+	create_proc_read_entry (KLIFE_PROC_BRD_NAME, 0644, board->proc_entry, &proc_board_name_read, board);
+
+	spin_unlock (&board->lock);
+	return 0;
+
+err:
+	spin_unlock (&board->lock);
+	return 1;
+}
+
+
+static int proc_board_name_read (char *page, char **start, off_t off,
+				 int count, int *eof, void *data)
+{
+	struct klife_board *board = data;
+	size_t len;
+
+	spin_lock (&board->lock);
+	len = strlen (board->name);
+	strncpy (page, board->name, count);
+	spin_unlock (&board->lock);
+
+	return proc_calc_metrics (page, start, off, count, eof, len);
+}
+
+
+/* Assume that board's spinlock held */
+int proc_delete_board (struct klife_board *board)
+{
+	char* name = get_board_index_str (board);
+
+	remove_proc_entry (KLIFE_PROC_BRD_NAME, board->proc_entry);
+	remove_proc_entry (name, boards);
+	kfree (name);
+
+	return 0;
+}
+
+
+static char* get_board_index_str (struct klife_board *board)
+{
+	char *name;
+	size_t len = 4;
+
+	BUG_ON (!board);
+
+	while (1) {
+		name = kmalloc (len, GFP_KERNEL);
+
+		if (unlikely (!name))
+			goto err;
+
+		if (snprintf (name, len, "%d", board->index)+1 > len) {
+			kfree (name);
+			len <<= 1;
+		}
+		else
+			break;
+	}
+
+	return name;
+err:
+	return NULL;
 }
