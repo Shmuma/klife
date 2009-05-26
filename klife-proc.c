@@ -204,6 +204,7 @@ static int proc_board_name_read (char *page, char **start, off_t off,
 	read_lock (&board->lock);
 	len = strlen (board->name);
 	strncpy (page, board->name, count);
+	strncat (page+len, "\n", count-len);
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
