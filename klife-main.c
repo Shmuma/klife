@@ -7,7 +7,7 @@
 
 struct klife_status klife;
 
-static void klife_delete_boards ();
+static void klife_delete_boards (void);
 
 
 static int klife_init (void)
@@ -17,7 +17,7 @@ static int klife_init (void)
 	klife.boards_running = 0;
 	klife.next_index = 0;
 	klife.ticks = 0UL;
-	klife.boards = NULL;
+	INIT_LIST_HEAD (&klife.boards);
 
 #ifdef CONFIG_PROC_FS
 	if (proc_register (&klife)) {
@@ -44,7 +44,7 @@ static void klife_exit (void)
 }
 
 
-static void klife_delete_boards ()
+static void klife_delete_boards (void)
 {
 	write_lock (&klife.lock);
 	// iterate over all boards and free them

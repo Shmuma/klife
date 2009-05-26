@@ -13,7 +13,7 @@ struct klife_board;
 
 
 struct klife_status {
-	rw_lock_t lock;
+	rwlock_t lock;
 	int boards_count;
 	int boards_running;
 	int next_index;
@@ -23,7 +23,7 @@ struct klife_status {
 
 
 struct klife_board {
-	rw_lock_t lock;
+	rwlock_t lock;
 	struct list_head next;
 	int index;
 	char* name;
