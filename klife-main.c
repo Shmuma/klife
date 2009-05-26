@@ -46,12 +46,12 @@ static void klife_exit (void)
 
 static void klife_delete_boards (void)
 {
-	struct list_head *list;
+	struct list_head *list, *ll;
 	struct klife_board *board;
 
 	write_lock (&klife.lock);
 	// iterate over all boards and free them
-	list_for_each (list, &klife.boards) {
+	list_for_each_safe (list, ll, &klife.boards) {
 		board = list_entry (list, struct klife_board, next);
 		klife_delete_board (board);
 	}
