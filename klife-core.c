@@ -38,19 +38,16 @@ err:
 
 
 
+/* this routine assumes that klife status strucure lock is already held */
 int klife_delete_board (struct klife_board *board)
 {
 	BUG_ON (!board);
-
-	write_lock (&klife.lock);
 
 	list_del (&board->next);
 
 	write_lock (&board->lock);
 	proc_delete_board (board);
 	write_unlock (&board->lock);
-
-	write_unlock (&klife.lock);
 
 	return 0;
 }
