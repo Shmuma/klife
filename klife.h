@@ -13,17 +13,17 @@ struct klife_board;
 
 
 struct klife_status {
-	spinlock_t lock;
+	rw_lock_t lock;
 	int boards_count;
 	int boards_running;
 	int next_index;
 	unsigned long long ticks;
-	struct klife_board *boards;	/* linked list */
+	struct list_head boards;
 };
 
 
 struct klife_board {
-	spinlock_t lock;
+	rw_lock_t lock;
 	struct list_head next;
 	int index;
 	char* name;
@@ -32,6 +32,7 @@ struct klife_board {
 
 
 int klife_create_board (char *name);
+int klife_delete_board (struct klife_board *board);
 
 extern struct klife_status klife;
 

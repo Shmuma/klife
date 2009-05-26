@@ -115,9 +115,10 @@ static int proc_status_read (char *page, char **start, off_t off,
 	int len;
 	struct klife_status *klife = data;
 
-	spin_lock (&klife->lock);
-	len = sprintf (page, "Boards: %d\nRunning: %d\nTotal ticks: %llu\n", klife->boards_count, klife->boards_running, klife->ticks);
-	spin_unlock (&klife->lock);
+	read_lock (&klife->lock);
+	len = sprintf (page, "Boards: %d\nRunning: %d\nTotal ticks: %llu\n", 
+		       klife->boards_count, klife->boards_running, klife->ticks);
+	read_unlock (&klife->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
 }
@@ -173,7 +174,7 @@ int proc_create_board (struct klife_board *board)
 	char *name;
 
 	BUG_ON (!board);
-	spin_lock (&board->lock);
+	write_lock (&board->lock);
 
 	name = get_board_index_str (board);
 	if (unlikely (!name))
@@ -182,13 +183,14 @@ int proc_create_board (struct klife_board *board)
 	board->proc_entry = proc_mkdir (name, boards);
 	kfree (name);
 
-	create_proc_read_entry (KLIFE_PROC_BRD_NAME, 0644, board->proc_entry, &proc_board_name_read, board);
+	create_proc_read_entry (KLIFE_PROC_BRD_NAME, 0644, board->proc_entry,
+				&proc_board_name_read, board);
 
-	spin_unlock (&board->lock);
+	write_unlock (&board->lock);
 	return 0;
 
 err:
-	spin_unlock (&board->lock);
+	write_unlock (&board->lock);
 	return 1;
 }
 
@@ -199,10 +201,10 @@ static int proc_board_name_read (char *page, char **start, off_t off,
 	struct klife_board *board = data;
 	size_t len;
 
-	spin_lock (&board->lock);
+	read_lock (&board->lock);
 	len = strlen (board->name);
 	strncpy (page, board->name, count);
-	spin_unlock (&board->lock);
+	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
 }

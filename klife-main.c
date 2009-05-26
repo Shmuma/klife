@@ -7,10 +7,12 @@
 
 struct klife_status klife;
 
+static void klife_delete_boards ();
+
 
 static int klife_init (void)
 {
-	klife.lock = SPIN_LOCK_UNLOCKED;
+	klife.lock = RW_LOCK_UNLOCKED;
 	klife.boards_count = 0;
 	klife.boards_running = 0;
 	klife.next_index = 0;
@@ -33,10 +35,20 @@ static int klife_init (void)
 
 static void klife_exit (void)
 {
+	klife_delete_boards ();
+
 #ifdef CONFIG_PROC_FS
 	proc_free ();
 #endif
 	printk (KERN_INFO "klife module unloaded\n");
+}
+
+
+static void klife_delete_boards ()
+{
+	write_lock (&klife.lock);
+	// iterate over all boards and free them
+	write_unlock (&klife.lock);
 }
 
 
@@ -46,6 +58,3 @@ module_exit (klife_exit);
 MODULE_AUTHOR ("Max Lapan <max.lapan@gmail.com>");
 MODULE_DESCRIPTION ("Study module: life game simulator");
 MODULE_LICENSE ("GPL");
-
-
-
