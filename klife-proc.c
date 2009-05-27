@@ -311,8 +311,8 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 	int len;
 
 	read_lock (&board->lock);
-	len = snprintf (page, count, "Mode: %s\nEnabled: %s\n", board_mode_as_string (board->mode),
-			board->enabled ? "Yes" : "No");
+	len = snprintf (page, count, "Mode:\t\t%s\nEnabled:\t%s\n", board_mode_as_string (board->mode),
+			board->enabled ? "yes" : "no");
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
