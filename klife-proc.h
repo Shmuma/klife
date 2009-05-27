@@ -12,6 +12,8 @@
 
 /* board entryes */
 #define KLIFE_PROC_BRD_NAME "name"
+#define KLIFE_PROC_BRD_MODE "mode"
+#define KLIFE_PROC_BRD_STATUS "status"
 
 extern int proc_register (struct klife_status *klife);
 extern int proc_free (void);
