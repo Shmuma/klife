@@ -274,7 +274,7 @@ static int proc_board_mode_read (char *page, char **start, off_t off,
 	int len;
 
 	read_lock (&board->lock);
-	len = snprintf ("%s\n", count, board_mode_as_string (board->mode));
+	len = snprintf (page, count, "%s\n", board_mode_as_string (board->mode));
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
@@ -289,7 +289,7 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 	int len;
 
 	read_lock (&board->lock);
-	len = snprintf ("%s\n", count, board_status_as_string (board->status));
+	len = snprintf (page, count, "%s\n", board_status_as_string (board->status));
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
