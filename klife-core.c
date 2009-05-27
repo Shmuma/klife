@@ -19,7 +19,7 @@ int klife_create_board (char *name)
 	board->index = klife.next_index;
 	board->lock = RW_LOCK_UNLOCKED;
 	board->mode = KBM_STEP;
-	board->status = KBS_DISABLED;
+	board->enabled = 0;
 	INIT_LIST_HEAD (&board->next);
 	list_add (&board->next, &klife.boards);
 	if (proc_create_board (board))

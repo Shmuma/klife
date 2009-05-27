@@ -28,19 +28,13 @@ typedef enum {
 } klife_board_mode_t;
 
 
-typedef enum {
-	KBS_DISABLED,
-	KBS_ENABLED,
-} klife_board_status_t;
-
-
 struct klife_board {
 	rwlock_t lock;
 	struct list_head next;
 	int index;
 	char* name;
 	klife_board_mode_t mode;
-	klife_board_status_t status;
+	int enabled;
 	struct proc_dir_entry *proc_entry;
 };
 
