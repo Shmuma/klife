@@ -238,6 +238,9 @@ int proc_delete_board (struct klife_board *board)
 	char* name = get_board_index_str (board);
 
 	remove_proc_entry (KLIFE_PROC_BRD_NAME, board->proc_entry);
+	remove_proc_entry (KLIFE_PROC_BRD_MODE, board->proc_entry);
+	remove_proc_entry (KLIFE_PROC_BRD_ENABLED, board->proc_entry);
+	remove_proc_entry (KLIFE_PROC_BRD_STATUS, board->proc_entry);
 	remove_proc_entry (name, boards);
 	kfree (name);
 
