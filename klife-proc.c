@@ -32,6 +32,9 @@ static int proc_board_mode_read (char *page, char **start, off_t off,
 static int proc_board_enabled_read (char *page, char **start, off_t off,
 				    int count, int *eof, void *data);
 
+static int proc_board_status_read (char *page, char **start, off_t off,
+				   int count, int *eof, void *data);
+
 /* Utility functions */
 static char* get_board_index_str (struct klife_board *board);
 
@@ -194,6 +197,8 @@ int proc_create_board (struct klife_board *board)
 
 	create_proc_read_entry (KLIFE_PROC_BRD_NAME, 0644, board->proc_entry,
 				&proc_board_name_read, board);
+	create_proc_read_entry (KLIFE_PROC_BRD_STATUS, 0644, board->proc_entry,
+				&proc_board_status_read, board);
 
 	mode = create_proc_read_entry (KLIFE_PROC_BRD_MODE, 0644, board->proc_entry,
 				       &proc_board_mode_read, board);
@@ -290,6 +295,21 @@ static int proc_board_enabled_read (char *page, char **start, off_t off,
 
 	read_lock (&board->lock);
 	len = snprintf (page, count, "%s\n", board_enabled_as_string (board->enabled));
+	read_unlock (&board->lock);
+
+	return proc_calc_metrics (page, start, off, count, eof, len);
+}
+
+
+static int proc_board_status_read (char *page, char **start, off_t off,
+				   int count, int *eof, void *data)
+{
+	struct klife_board *board = data;
+	int len;
+
+	read_lock (&board->lock);
+	len = snprintf (page, count, "Mode: %s\nEnabled: %s\n", board_mode_as_string (board->mode),
+			board->enabled ? "Yes" : "No");
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
