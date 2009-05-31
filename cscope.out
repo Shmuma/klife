@@ -1,0 +1,2285 @@
+cscope 15 $HOME/work/kernel/klife -q 0000000129 0000011537
+	@klife-core.c
+
+1 
+	~"kli„.h
+"
+
+2 
+	~"kli„-¥oc.h
+"
+
+4 
+	~<löux/kî√l.h
+>
+
+5 
+	~<löux/¶ab.h
+>
+
+8 
+	$kli„_¸óã_bﬂrd
+ (*
+«me
+)
+
+10 
+kli„_bﬂrd
+ *
+bﬂrd
+;
+
+12 
+bﬂrd
+ = 
+	`kmÆloc
+ ( (
+kli„_bﬂrd
+), 
+GFP_KERNEL
+);
+
+14 i‡(!
+bﬂrd
+)
+
+15  -
+ENOMEM
+;
+
+17 
+	`wrôe_lock
+ (&
+kli„
+.
+lock
+);
+
+18 
+bﬂrd
+->
+«me
+ =Çame;
+
+19 
+bﬂrd
+->
+ödex
+ = 
+kli„
+.
+√xt_ödex
+;
+
+20 
+bﬂrd
+->
+lock
+ = 
+RW_LOCK_UNLOCKED
+;
+
+21 
+bﬂrd
+->
+mode
+ = 
+KBM_STEP
+;
+
+22 
+bﬂrd
+->
+íabÀd
+ = 0;
+
+23 
+	`INIT_LIST_HEAD
+ (&
+bﬂrd
+->
+√xt
+);
+
+24 
+	`li°_add
+ (&
+bﬂrd
+->
+√xt
+, &
+kli„
+.
+bﬂrds
+);
+
+25 i‡(
+	`¥oc_¸óã_bﬂrd
+ (
+bﬂrd
+))
+
+26 
+îr
+;
+
+28 
+kli„
+.
+bﬂrds_cou¡
+++;
+
+29 
+kli„
+.
+√xt_ödex
+++;
+
+30 
+	`wrôe_u∆ock
+ (&
+kli„
+.
+lock
+);
+
+33 
+îr
+:
+
+34 
+	`wrôe_u∆ock
+ (&
+kli„
+.
+lock
+);
+
+35 
+	`li°_dñ
+ (&
+bﬂrd
+->
+√xt
+);
+
+36 
+	`k‰ì
+ (
+bﬂrd
+);
+
+37 
+	`k‰ì
+ (
+«me
+);
+
+38  -
+ENOMEM
+;
+
+39 
+	}
+}
+
+44 
+	$kli„_dñëe_bﬂrd
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+)
+
+46 
+	`BUG_ON
+ (!
+bﬂrd
+);
+
+48 
+	`li°_dñ
+ (&
+bﬂrd
+->
+√xt
+);
+
+50 
+	`wrôe_lock
+ (&
+bﬂrd
+->
+lock
+);
+
+51 
+	`¥oc_dñëe_bﬂrd
+ (
+bﬂrd
+);
+
+52 
+	`wrôe_u∆ock
+ (&
+bﬂrd
+->
+lock
+);
+
+55 
+	}
+}
+
+	@klife-main.c
+
+1 
+	~<löux/kî√l.h
+>
+
+2 
+	~<löux/moduÀ.h
+>
+
+4 
+	~"kli„.h
+"
+
+5 
+	~"kli„-¥oc.h
+"
+
+8 
+kli„_°©us
+ 
+	gkli„
+;
+
+10 
+kli„_dñëe_bﬂrds
+ ();
+
+13 
+	$kli„_öô
+ ()
+
+15 
+kli„
+.
+lock
+ = 
+RW_LOCK_UNLOCKED
+;
+
+16 
+kli„
+.
+bﬂrds_cou¡
+ = 0;
+
+17 
+kli„
+.
+bﬂrds_ru¬ög
+ = 0;
+
+18 
+kli„
+.
+√xt_ödex
+ = 0;
+
+19 
+kli„
+.
+ticks
+ = 0UL;
+
+20 
+	`INIT_LIST_HEAD
+ (&
+kli„
+.
+bﬂrds
+);
+
+22 #ifde‡
+CONFIG_PROC_FS
+
+
+23 i‡(
+	`¥oc_ªgi°î
+ (&
+kli„
+)) {
+
+24 
+	`¥ötk
+ (
+KERN_WARNING
+ "klife module failedÅo initialize /proc interface\n");
+
+28 
+	`¥ötk
+ (
+KERN_ERR
+ "klife moduleÇeeds /proc\n");
+
+29  -
+ENODATA
+;
+
+31 
+	`¥ötk
+ (
+KERN_INFO
+ "klife module initialized\n");
+
+33 
+	}
+}
+
+36 
+	$kli„_exô
+ ()
+
+38 
+	`kli„_dñëe_bﬂrds
+ ();
+
+40 #ifde‡
+CONFIG_PROC_FS
+
+
+41 
+	`¥oc_‰ì
+ ();
+
+43 
+	`¥ötk
+ (
+KERN_INFO
+ "klife module unloaded\n");
+
+44 
+	}
+}
+
+47 
+	$kli„_dñëe_bﬂrds
+ ()
+
+49 
+li°_hód
+ *
+li°
+, *
+Œ
+;
+
+50 
+kli„_bﬂrd
+ *
+bﬂrd
+;
+
+52 
+	`wrôe_lock
+ (&
+kli„
+.
+lock
+);
+
+54 
+	`li°_f‹_óch_ß„
+ (
+li°
+, 
+Œ
+, &
+kli„
+.
+bﬂrds
+) {
+
+55 
+bﬂrd
+ = 
+	`li°_íåy
+ (
+li°
+, 
+kli„_bﬂrd
+, 
+√xt
+);
+
+56 
+	`kli„_dñëe_bﬂrd
+ (
+bﬂrd
+);
+
+58 
+	`wrôe_u∆ock
+ (&
+kli„
+.
+lock
+);
+
+59 
+	}
+}
+
+62 
+moduÀ_öô
+ (
+kli„_öô
+);
+
+63 
+moduÀ_exô
+ (
+kli„_exô
+);
+
+65 
+MODULE_AUTHOR
+ ("Max Lapan <max.lapan@gmail.com>");
+
+66 
+MODULE_DESCRIPTION
+ ("Study module:Üife game simulator");
+
+67 
+MODULE_LICENSE
+ ("GPL");
+
+	@klife-proc.c
+
+1 
+	~<löux/kî√l.h
+>
+
+2 
+	~<löux/¥oc_fs.h
+>
+
+3 
+	~<löux/uac˚ss.h
+>
+
+4 
+	~<löux/°rög.h
+>
+
+6 
+	~"kli„.h
+"
+
+7 
+	~"kli„-¥oc.h
+"
+
+9 
+¥oc_dú_íåy
+ *
+	groŸ
+;
+
+10 
+¥oc_dú_íåy
+ *
+	gbﬂrds
+;
+
+13 
+¥oc_vîsi⁄_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+14 
+cou¡
+, *
+eof
+, *
+d©a
+);
+
+16 
+¥oc_°©us_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+17 
+cou¡
+, *
+eof
+, *
+d©a
+);
+
+19 
+¥oc_¸óã_wrôe
+ (
+fûe
+ *fûe, c⁄° 
+__u£r
+ *
+buf„r
+,
+
+20 
+cou¡
+, *
+d©a
+);
+
+22 
+¥oc_de°roy_wrôe
+ (
+fûe
+ *fûe, c⁄° 
+__u£r
+ *
+buf„r
+,
+
+23 
+cou¡
+, *
+d©a
+);
+
+26 
+¥oc_bﬂrd_«me_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+27 
+cou¡
+, *
+eof
+, *
+d©a
+);
+
+29 
+¥oc_bﬂrd_mode_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+30 
+cou¡
+, *
+eof
+, *
+d©a
+);
+
+32 
+¥oc_bﬂrd_íabÀd_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+33 
+cou¡
+, *
+eof
+, *
+d©a
+);
+
+35 
+¥oc_bﬂrd_°©us_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+36 
+cou¡
+, *
+eof
+, *
+d©a
+);
+
+39 * 
+gë_bﬂrd_ödex_°r
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+);
+
+41 
+ölöe
+ c⁄° * 
+bﬂrd_mode_as_°rög
+ (
+kli„_bﬂrd_mode_t
+ 
+mode
+);
+
+42 
+ölöe
+ c⁄° * 
+bﬂrd_íabÀd_as_°rög
+ (
+íabÀd
+);
+
+45 
+	$¥oc_ªgi°î
+ (
+kli„_°©us
+ *
+kli„
+)
+
+47 
+¥oc_dú_íåy
+ *
+vîsi⁄
+, *
+°©us
+, *
+¸óã
+, *
+de°roy
+;
+
+49 
+roŸ
+ = 
+	`¥oc_mkdú
+ (
+KLIFE_PROC_ROOT
+, 
+NULL
+);
+
+50 i‡(
+	`u∆ikñy
+ (!
+roŸ
+))
+
+51 
+îr
+;
+
+53 
+vîsi⁄
+ = 
+	`¸óã_¥oc_ªad_íåy
+ (
+KLIFE_PROC_VERSION
+, 0644, 
+roŸ
+,
+
+54 &
+¥oc_vîsi⁄_ªad
+, 
+kli„
+);
+
+55 
+°©us
+ = 
+	`¸óã_¥oc_ªad_íåy
+ (
+KLIFE_PROC_STATUS
+, 0644, 
+roŸ
+,
+
+56 &
+¥oc_°©us_ªad
+, 
+kli„
+);
+
+58 
+bﬂrds
+ = 
+	`¥oc_mkdú
+ (
+KLIFE_PROC_BOARDS
+, 
+roŸ
+);
+
+59 i‡(
+	`u∆ikñy
+ (!
+bﬂrds
+))
+
+60 
+îr
+;
+
+62 
+¸óã
+ = 
+	`¸óã_¥oc_íåy
+ (
+KLIFE_PROC_CREATE
+, 0644, 
+bﬂrds
+);
+
+63 i‡(
+	`likñy
+ (
+¸óã
+)) {
+
+64 
+¸óã
+->
+wrôe_¥oc
+ = 
+¥oc_¸óã_wrôe
+;
+
+65 
+¸óã
+->
+d©a
+ = 
+kli„
+;
+
+68 
+îr
+;
+
+70 
+de°roy
+ = 
+	`¸óã_¥oc_íåy
+ (
+KLIFE_PROC_DESTROY
+, 0644, 
+bﬂrds
+);
+
+71 i‡(
+	`likñy
+ (
+de°roy
+)) {
+
+72 
+de°roy
+->
+wrôe_¥oc
+ = 
+¥oc_de°roy_wrôe
+;
+
+73 
+de°roy
+->
+d©a
+ = 
+kli„
+;
+
+76 
+îr
+;
+
+79 
+îr
+:
+
+80 
+	`¥oc_‰ì
+ ();
+
+82 
+	}
+}
+
+85 
+	$¥oc_‰ì
+ ()
+
+87 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_CREATE
+, 
+bﬂrds
+);
+
+88 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_DESTROY
+, 
+bﬂrds
+);
+
+89 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_BOARDS
+, 
+roŸ
+);
+
+90 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_VERSION
+, 
+roŸ
+);
+
+91 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_STATUS
+, 
+roŸ
+);
+
+92 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_ROOT
+, 
+NULL
+);
+
+94 
+	}
+}
+
+97 
+	$¥oc_ˇlc_mërics
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+98 
+cou¡
+, *
+eof
+, 
+Àn
+)
+
+100 i‡(
+Àn
+ <
+off
++
+cou¡
+)
+
+101 *
+eof
+ = 1;
+
+102 *
+°¨t
+ = 
+∑ge
+ + 
+off
+;
+
+103 
+Àn
+ -
+off
+;
+
+104 i‡(
+Àn
+ < 0)
+
+105 
+Àn
+ = 0;
+
+106 i‡(
+Àn
+ > 
+cou¡
+)
+
+107 
+Àn
+ = 
+cou¡
+;
+
+108  
+Àn
+;
+
+109 
+	}
+}
+
+112 
+	$¥oc_vîsi⁄_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+113 
+cou¡
+, *
+eof
+, *
+d©a
+)
+
+115 
+Àn
+;
+
+117 
+Àn
+ = 
+	`•rötf
+ (
+∑ge
+, "Kernel Life game simulator %d.%d\n",
+
+118 
+KLIFE_VER_MAJOR
+, 
+KLIFE_VER_MINOR
+);
+
+119  
+	`¥oc_ˇlc_mërics
+ (
+∑ge
+, 
+°¨t
+, 
+off
+, 
+cou¡
+, 
+eof
+, 
+Àn
+);
+
+120 
+	}
+}
+
+123 
+	$¥oc_°©us_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+124 
+cou¡
+, *
+eof
+, *
+d©a
+)
+
+126 
+Àn
+;
+
+127 
+kli„_°©us
+ *
+kli„
+ = 
+d©a
+;
+
+129 
+	`ªad_lock
+ (&
+kli„
+->
+lock
+);
+
+130 
+Àn
+ = 
+	`•rötf
+ (
+∑ge
+, "Boards: %d\nRunning: %d\nTotalÅicks: %llu\n",
+
+131 
+kli„
+->
+bﬂrds_cou¡
+, kli„->
+bﬂrds_ru¬ög
+, kli„->
+ticks
+);
+
+132 
+	`ªad_u∆ock
+ (&
+kli„
+->
+lock
+);
+
+134  
+	`¥oc_ˇlc_mërics
+ (
+∑ge
+, 
+°¨t
+, 
+off
+, 
+cou¡
+, 
+eof
+, 
+Àn
+);
+
+135 
+	}
+}
+
+138 
+	$¥oc_¸óã_wrôe
+ (
+fûe
+ *fûe, c⁄° 
+__u£r
+ *
+buf„r
+,
+
+139 
+cou¡
+, *
+d©a
+)
+
+141 
+size_t
+ 
+Àn
+;
+
+142 * 
+«me
+ = 
+NULL
+;
+
+143 
+ªt
+;
+
+145 i‡(!
+cou¡
+) {
+
+146 
+	`¥ötk
+ (
+KERN_WARNING
+ "Error creating board,Çame is invalid\n");
+
+147  -
+EINVAL
+;
+
+151 
+«me
+ = 
+	`kmÆloc
+ (
+cou¡
++1, 
+GFP_KERNEL
+);
+
+152 i‡(!
+«me
+)
+
+153  -
+ENOMEM
+;
+
+156 
+Àn
+ = 
+cou¡
+;
+
+157 
+Àn
+ -
+	`c›y_‰om_u£r
+ (
+«me
+, 
+buf„r
+, 
+cou¡
+);
+
+158 i‡(
+Àn
+ <= 0) {
+
+159 
+	`k‰ì
+ (
+«me
+);
+
+160  -
+EINVAL
+;
+
+163 
+Àn
+ > 0 && 
+«me
+[len-1] == '\n')
+
+164 
+Àn
+--;
+
+165 
+«me
+[
+Àn
+] = 0;
+
+166 
+	`¥ötk
+ (
+KERN_INFO
+ "Cª©ê√w bﬂrd wôhÇamê'%s'\n", 
+«me
+);
+
+167 
+ªt
+ = 
+	`kli„_¸óã_bﬂrd
+ (
+«me
+);
+
+168 i‡(
+ªt
+)
+
+169 
+	`k‰ì
+ (
+«me
+);
+
+171 
+ªt
+ = 
+cou¡
+;
+
+172  
+ªt
+;
+
+173 
+	}
+}
+
+176 
+	$¥oc_de°roy_wrôe
+ (
+fûe
+ *fûe, c⁄° 
+__u£r
+ *
+buf„r
+,
+
+177 
+cou¡
+, *
+d©a
+)
+
+179  
+cou¡
+;
+
+180 
+	}
+}
+
+183 
+	$¥oc_¸óã_bﬂrd
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+)
+
+185 *
+«me
+;
+
+186 
+¥oc_dú_íåy
+ *
+mode
+, *
+íabÀd
+;
+
+188 
+	`BUG_ON
+ (!
+bﬂrd
+);
+
+189 
+	`wrôe_lock
+ (&
+bﬂrd
+->
+lock
+);
+
+191 
+«me
+ = 
+	`gë_bﬂrd_ödex_°r
+ (
+bﬂrd
+);
+
+192 i‡(
+	`u∆ikñy
+ (!
+«me
+))
+
+193 
+îr
+;
+
+195 
+bﬂrd
+->
+¥oc_íåy
+ = 
+	`¥oc_mkdú
+ (
+«me
+, 
+bﬂrds
+);
+
+196 
+	`k‰ì
+ (
+«me
+);
+
+198 
+	`¸óã_¥oc_ªad_íåy
+ (
+KLIFE_PROC_BRD_NAME
+, 0644, 
+bﬂrd
+->
+¥oc_íåy
+,
+
+199 &
+¥oc_bﬂrd_«me_ªad
+, 
+bﬂrd
+);
+
+200 
+	`¸óã_¥oc_ªad_íåy
+ (
+KLIFE_PROC_BRD_STATUS
+, 0644, 
+bﬂrd
+->
+¥oc_íåy
+,
+
+201 &
+¥oc_bﬂrd_°©us_ªad
+, 
+bﬂrd
+);
+
+203 
+mode
+ = 
+	`¸óã_¥oc_ªad_íåy
+ (
+KLIFE_PROC_BRD_MODE
+, 0644, 
+bﬂrd
+->
+¥oc_íåy
+,
+
+204 &
+¥oc_bﬂrd_mode_ªad
+, 
+bﬂrd
+);
+
+206 
+íabÀd
+ = 
+	`¸óã_¥oc_ªad_íåy
+ (
+KLIFE_PROC_BRD_ENABLED
+, 0644, 
+bﬂrd
+->
+¥oc_íåy
+,
+
+207 &
+¥oc_bﬂrd_íabÀd_ªad
+, 
+bﬂrd
+);
+
+209 
+	`wrôe_u∆ock
+ (&
+bﬂrd
+->
+lock
+);
+
+212 
+îr
+:
+
+213 
+	`wrôe_u∆ock
+ (&
+bﬂrd
+->
+lock
+);
+
+215 
+	}
+}
+
+218 
+	$¥oc_bﬂrd_«me_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+219 
+cou¡
+, *
+eof
+, *
+d©a
+)
+
+221 
+kli„_bﬂrd
+ *
+bﬂrd
+ = 
+d©a
+;
+
+222 
+size_t
+ 
+Àn
+;
+
+224 
+	`ªad_lock
+ (&
+bﬂrd
+->
+lock
+);
+
+225 
+Àn
+ = 
+	`°æí
+ (
+bﬂrd
+->
+«me
+);
+
+226 
+	`°∫˝y
+ (
+∑ge
+, 
+bﬂrd
+->
+«me
+, 
+cou¡
+);
+
+227 
+	`°∫ˇt
+ (
+∑ge
++
+Àn
+, "\n", 
+cou¡
+-len);
+
+228 
+Àn
+ += 2;
+
+229 
+	`ªad_u∆ock
+ (&
+bﬂrd
+->
+lock
+);
+
+231  
+	`¥oc_ˇlc_mërics
+ (
+∑ge
+, 
+°¨t
+, 
+off
+, 
+cou¡
+, 
+eof
+, 
+Àn
+);
+
+232 
+	}
+}
+
+236 
+	$¥oc_dñëe_bﬂrd
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+)
+
+238 * 
+«me
+ = 
+	`gë_bﬂrd_ödex_°r
+ (
+bﬂrd
+);
+
+240 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_BRD_NAME
+, 
+bﬂrd
+->
+¥oc_íåy
+);
+
+241 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_BRD_MODE
+, 
+bﬂrd
+->
+¥oc_íåy
+);
+
+242 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_BRD_ENABLED
+, 
+bﬂrd
+->
+¥oc_íåy
+);
+
+243 
+	`ªmove_¥oc_íåy
+ (
+KLIFE_PROC_BRD_STATUS
+, 
+bﬂrd
+->
+¥oc_íåy
+);
+
+244 
+	`ªmove_¥oc_íåy
+ (
+«me
+, 
+bﬂrds
+);
+
+245 
+	`k‰ì
+ (
+«me
+);
+
+248 
+	}
+}
+
+251 * 
+	$gë_bﬂrd_ödex_°r
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+)
+
+253 *
+«me
+;
+
+254 
+size_t
+ 
+Àn
+ = 4;
+
+256 
+	`BUG_ON
+ (!
+bﬂrd
+);
+
+259 
+«me
+ = 
+	`kmÆloc
+ (
+Àn
+, 
+GFP_KERNEL
+);
+
+261 i‡(
+	`u∆ikñy
+ (!
+«me
+))
+
+262 
+îr
+;
+
+264 i‡(
+	`¢¥ötf
+ (
+«me
+, 
+Àn
+, "%d", 
+bﬂrd
+->
+ödex
+)+1 >Üen) {
+
+265 
+	`k‰ì
+ (
+«me
+);
+
+266 
+Àn
+ <<= 1;
+
+272  
+«me
+;
+
+273 
+îr
+:
+
+274  
+NULL
+;
+
+275 
+	}
+}
+
+278 
+	$¥oc_bﬂrd_mode_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+279 
+cou¡
+, *
+eof
+, *
+d©a
+)
+
+281 
+kli„_bﬂrd
+ *
+bﬂrd
+ = 
+d©a
+;
+
+282 
+Àn
+;
+
+284 
+	`ªad_lock
+ (&
+bﬂrd
+->
+lock
+);
+
+285 
+Àn
+ = 
+	`¢¥ötf
+ (
+∑ge
+, 
+cou¡
+, "%s\n", 
+	`bﬂrd_mode_as_°rög
+ (
+bﬂrd
+->
+mode
+));
+
+286 
+	`ªad_u∆ock
+ (&
+bﬂrd
+->
+lock
+);
+
+288  
+	`¥oc_ˇlc_mërics
+ (
+∑ge
+, 
+°¨t
+, 
+off
+, 
+cou¡
+, 
+eof
+, 
+Àn
+);
+
+289 
+	}
+}
+
+293 
+	$¥oc_bﬂrd_íabÀd_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+294 
+cou¡
+, *
+eof
+, *
+d©a
+)
+
+296 
+kli„_bﬂrd
+ *
+bﬂrd
+ = 
+d©a
+;
+
+297 
+Àn
+;
+
+299 
+	`ªad_lock
+ (&
+bﬂrd
+->
+lock
+);
+
+300 
+Àn
+ = 
+	`¢¥ötf
+ (
+∑ge
+, 
+cou¡
+, "%s\n", 
+	`bﬂrd_íabÀd_as_°rög
+ (
+bﬂrd
+->
+íabÀd
+));
+
+301 
+	`ªad_u∆ock
+ (&
+bﬂrd
+->
+lock
+);
+
+303  
+	`¥oc_ˇlc_mërics
+ (
+∑ge
+, 
+°¨t
+, 
+off
+, 
+cou¡
+, 
+eof
+, 
+Àn
+);
+
+304 
+	}
+}
+
+307 
+	$¥oc_bﬂrd_°©us_ªad
+ (*
+∑ge
+, **
+°¨t
+, 
+off_t
+ 
+off
+,
+
+308 
+cou¡
+, *
+eof
+, *
+d©a
+)
+
+310 
+kli„_bﬂrd
+ *
+bﬂrd
+ = 
+d©a
+;
+
+311 
+Àn
+;
+
+313 
+	`ªad_lock
+ (&
+bﬂrd
+->
+lock
+);
+
+314 
+Àn
+ = 
+	`¢¥ötf
+ (
+∑ge
+, 
+cou¡
+, "Mode:\t\t%s\nE«bÀd:\t%s\n", 
+	`bﬂrd_mode_as_°rög
+ (
+bﬂrd
+->
+mode
+),
+
+315 
+bﬂrd
+->
+íabÀd
+ ? "yes" : "no");
+
+316 
+	`ªad_u∆ock
+ (&
+bﬂrd
+->
+lock
+);
+
+318  
+	`¥oc_ˇlc_mërics
+ (
+∑ge
+, 
+°¨t
+, 
+off
+, 
+cou¡
+, 
+eof
+, 
+Àn
+);
+
+319 
+	}
+}
+
+325 
+ölöe
+ c⁄° * 
+	$bﬂrd_mode_as_°rög
+ (
+kli„_bﬂrd_mode_t
+ 
+mode
+)
+
+327 
+mode
+) {
+
+328 
+KBM_STEP
+:
+
+330 
+KBM_RUN
+:
+
+335 
+	}
+}
+
+338 
+ölöe
+ c⁄° * 
+	$bﬂrd_íabÀd_as_°rög
+ (
+íabÀd
+)
+
+340 
+íabÀd
+) {
+
+346 
+	}
+}
+
+	@klife-proc.h
+
+1 #i‚de‡
+__KLIFE_PROC_H__
+
+
+2 
+	#__KLIFE_PROC_H__
+
+
+	)
+
+4 
+	~"kli„.h
+"
+
+6 
+	#KLIFE_PROC_ROOT
+ "kli„"
+
+	)
+
+7 
+	#KLIFE_PROC_VERSION
+ "vîsi⁄"
+
+	)
+
+8 
+	#KLIFE_PROC_STATUS
+ "°©us"
+
+	)
+
+9 
+	#KLIFE_PROC_BOARDS
+ "bﬂrds"
+
+	)
+
+10 
+	#KLIFE_PROC_CREATE
+ "¸óã"
+
+	)
+
+11 
+	#KLIFE_PROC_DESTROY
+ "de°roy"
+
+	)
+
+14 
+	#KLIFE_PROC_BRD_NAME
+ "«me"
+
+	)
+
+15 
+	#KLIFE_PROC_BRD_MODE
+ "mode"
+
+	)
+
+16 
+	#KLIFE_PROC_BRD_ENABLED
+ "íabÀd"
+
+	)
+
+17 
+	#KLIFE_PROC_BRD_STATUS
+ "°©us"
+
+	)
+
+19 
+¥oc_ªgi°î
+ (
+kli„_°©us
+ *
+kli„
+);
+
+20 
+¥oc_‰ì
+ ();
+
+22 
+¥oc_¸óã_bﬂrd
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+);
+
+23 
+¥oc_dñëe_bﬂrd
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+);
+
+	@klife.h
+
+1 #i‚de‡
+__KLIFE_H__
+
+
+2 
+	#__KLIFE_H__
+
+
+	)
+
+4 
+	~<löux/kî√l.h
+>
+
+5 
+	~<löux/•ölock.h
+>
+
+6 
+	~<löux/¥oc_fs.h
+>
+
+8 
+	#KLIFE_VER_MAJOR
+ 0
+
+	)
+
+9 
+	#KLIFE_VER_MINOR
+ 1
+
+	)
+
+12 
+	gkli„_bﬂrd
+;
+
+15 
+	skli„_°©us
+ {
+
+16 
+rwlock_t
+ 
+	mlock
+;
+
+17 
+	mbﬂrds_cou¡
+;
+
+18 
+	mbﬂrds_ru¬ög
+;
+
+19 
+	m√xt_ödex
+;
+
+20 
+	mticks
+;
+
+21 
+li°_hód
+ 
+	mbﬂrds
+;
+
+26 
+	mKBM_STEP
+,
+
+27 
+	mKBM_RUN
+,
+
+28 } 
+	tkli„_bﬂrd_mode_t
+;
+
+31 
+	skli„_bﬂrd
+ {
+
+32 
+rwlock_t
+ 
+	mlock
+;
+
+33 
+li°_hód
+ 
+	m√xt
+;
+
+34 
+	mödex
+;
+
+35 * 
+	m«me
+;
+
+36 
+kli„_bﬂrd_mode_t
+ 
+	mmode
+;
+
+37 
+	míabÀd
+;
+
+38 
+¥oc_dú_íåy
+ *
+	m¥oc_íåy
+;
+
+42 
+kli„_¸óã_bﬂrd
+ (*
+«me
+);
+
+43 
+kli„_dñëe_bﬂrd
+ (
+kli„_bﬂrd
+ *
+bﬂrd
+);
+
+45 
+kli„_°©us
+ 
+kli„
+;
+
+	@
+1
+.
+1
+/usr/include
+5
+60
+klife-core.c
+klife-main.c
+klife-proc.c
+klife-proc.h
+klife.h
