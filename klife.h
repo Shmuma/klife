@@ -31,10 +31,23 @@ typedef enum {
 struct klife_board {
 	rwlock_t lock;
 	struct list_head next;
+
+	/* generic information */
 	int index;
 	char* name;
+
+	/* board operation mode and status */
 	klife_board_mode_t mode;
 	int enabled;
+
+	/* board dimensions */
+	int width;
+	int height;
+
+	/* board field's data */
+	char *field;
+
+	/* proc parent */
 	struct proc_dir_entry *proc_entry;
 };
 

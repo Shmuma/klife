@@ -20,6 +20,9 @@ int klife_create_board (char *name)
 	board->lock = RW_LOCK_UNLOCKED;
 	board->mode = KBM_STEP;
 	board->enabled = 0;
+	board->width = 0;
+	board->height = 0;
+	board->field = NULL;
 	INIT_LIST_HEAD (&board->next);
 	list_add (&board->next, &klife.boards);
 	if (proc_create_board (board))

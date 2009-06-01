@@ -42,6 +42,10 @@ static inline const char* board_mode_as_string (klife_board_mode_t mode);
 static inline const char* board_enabled_as_string (int enabled);
 
 
+
+/*
+ * Top-level module proc entries
+ */
 int proc_register (struct klife_status *klife)
 {
 	struct proc_dir_entry *version, *status, *create, *destroy;
@@ -180,10 +184,13 @@ static int proc_destroy_write (struct file *file, const char __user *buffer,
 }
 
 
+/*
+ * Board routines
+ */
 int proc_create_board (struct klife_board *board)
 {
 	char *name;
-	struct proc_dir_entry *mode, *enabled;
+	struct proc_dir_entry *entry = NULL;
 
 	BUG_ON (!board);
 	write_lock (&board->lock);
@@ -195,21 +202,44 @@ int proc_create_board (struct klife_board *board)
 	board->proc_entry = proc_mkdir (name, boards);
 	kfree (name);
 
-	create_proc_read_entry (KLIFE_PROC_BRD_NAME, 0644, board->proc_entry,
-				&proc_board_name_read, board);
-	create_proc_read_entry (KLIFE_PROC_BRD_STATUS, 0644, board->proc_entry,
+	if (unlikely (!board->proc_entry))
+		goto err;
+
+	entry = create_proc_read_entry (KLIFE_PROC_BRD_NAME, 0644, board->proc_entry,
+					     &proc_board_name_read, board);
+	if (unlikely (!entry))
+		goto err;
+
+	entry = create_proc_read_entry (KLIFE_PROC_BRD_STATUS, 0644, board->proc_entry,
 				&proc_board_status_read, board);
+	if (unlikely (!entry))
+		goto err;
 
-	mode = create_proc_read_entry (KLIFE_PROC_BRD_MODE, 0644, board->proc_entry,
+	entry = create_proc_read_entry (KLIFE_PROC_BRD_MODE, 0644, board->proc_entry,
 				       &proc_board_mode_read, board);
+	if (unlikely (!entry))
+		goto err;
 
-	enabled = create_proc_read_entry (KLIFE_PROC_BRD_ENABLED, 0644, board->proc_entry,
+	entry = create_proc_read_entry (KLIFE_PROC_BRD_ENABLED, 0644, board->proc_entry,
 					  &proc_board_enabled_read, board);
+	if (unlikely (!entry))
+		goto err;
+
+	entry = create_proc_entry (KLIFE_PROC_BRD_BOARD, 0644, board->proc_entry);
+
+	if (likely (entry)) {
+	}
+	else
+		goto err;
 
 	write_unlock (&board->lock);
 	return 0;
 
 err:
+	/* remove proc entries which was (probably) created */
+	if (board->proc_entry)
+		proc_delete_board (board);
+
 	write_unlock (&board->lock);
 	return 1;
 }
@@ -237,6 +267,7 @@ int proc_delete_board (struct klife_board *board)
 {
 	char* name = get_board_index_str (board);
 
+	remove_proc_entry (KLIFE_PROC_BRD_BOARD, board->proc_entry);
 	remove_proc_entry (KLIFE_PROC_BRD_NAME, board->proc_entry);
 	remove_proc_entry (KLIFE_PROC_BRD_MODE, board->proc_entry);
 	remove_proc_entry (KLIFE_PROC_BRD_ENABLED, board->proc_entry);
@@ -311,8 +342,8 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 	int len;
 
 	read_lock (&board->lock);
-	len = snprintf (page, count, "Mode:\t\t%s\nEnabled:\t%s\n", board_mode_as_string (board->mode),
-			board->enabled ? "yes" : "no");
+	len = snprintf (page, count, "Mode:\t\t%s\nEnabled:\t%s\nWidth:\t\t%d\nHeight:\t\t%d\n", board_mode_as_string (board->mode),
+			board->enabled ? "yes" : "no", board->width, board->height);
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
