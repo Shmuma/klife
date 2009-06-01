@@ -35,6 +35,12 @@ static int proc_board_enabled_read (char *page, char **start, off_t off,
 static int proc_board_status_read (char *page, char **start, off_t off,
 				   int count, int *eof, void *data);
 
+static int proc_board_read (char *page, char **start, off_t off,
+			    int count, int *eof, void *data);
+static int proc_board_write (struct file *file, const char __user *buffer,
+			     unsigned long count, void *data);
+
+
 /* Utility functions */
 static char* get_board_index_str (struct klife_board *board);
 
@@ -228,6 +234,9 @@ int proc_create_board (struct klife_board *board)
 	entry = create_proc_entry (KLIFE_PROC_BRD_BOARD, 0644, board->proc_entry);
 
 	if (likely (entry)) {
+		entry->write_proc = proc_board_write;
+		entry->read_proc = proc_board_read;
+		entry->data = board;
 	}
 	else
 		goto err;
@@ -347,6 +356,22 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
+}
+
+
+static int proc_board_read (char *page, char **start, off_t off,
+			    int count, int *eof, void *data)
+{
+/* 	struct klife_board *board = data; */
+	return 0;
+}
+
+
+static int proc_board_write (struct file *file, const char __user *buffer,
+			     unsigned long count, void *data)
+{
+/* 	struct klife_board *board = data; */
+	return count;
 }
 
 
