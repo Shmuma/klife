@@ -1,4 +1,8 @@
+<<<<<<< HEAD:cscope.out
 cscope 15 $HOME/work/kernel/klife -q 0000001355 0000127845
+=======
+cscope 15 $HOME/work/kernel/klife -q 0000000129 0000011537
+>>>>>>> origin/master:cscope.out
 	@klife-core.c
 
 1 
@@ -2271,6 +2275,7 @@ kliã_¡©us
 kliã
 ;
 
+<<<<<<< HEAD:cscope.out
 	@/usr/include/linux/kernel.h
 
 1 #iâdeà
@@ -22685,18 +22690,26 @@ __su£cÚds_t
 	mtv_u£c
 ;
 
+=======
+>>>>>>> origin/master:cscope.out
 	@
 1
 .
 1
 /usr/include
+<<<<<<< HEAD:cscope.out
 36
 884
+=======
+5
+60
+>>>>>>> origin/master:cscope.out
 klife-core.c
 klife-main.c
 klife-proc.c
 klife-proc.h
 klife.h
+<<<<<<< HEAD:cscope.out
 /usr/include/linux/kernel.h
 /usr/include/linux/string.h
 /usr/include/string.h
@@ -22728,3 +22741,5 @@ klife.h
 /usr/include/bits/select.h
 /usr/include/bits/sigset.h
 /usr/include/bits/time.h
+=======
+>>>>>>> origin/master:cscope.out
