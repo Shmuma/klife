@@ -42,11 +42,18 @@ static int proc_board_write (struct file *file, const char __user *buffer,
 
 
 /* Utility functions */
+typedef enum {
+	REQ_SET,
+	REQ_CLEAR,
+	REQ_TOGGLE,
+} change_request_kind_t;
+
 static char* get_board_index_str (struct klife_board *board);
 
 static inline const char* board_mode_as_string (klife_board_mode_t mode);
 static inline const char* board_enabled_as_string (int enabled);
 
+static int parse_change_request (char *data, unsigned long max_ofs, unsigned long *ofs, change_request_kind_t *req, int *x, int *y);
 
 
 /*
@@ -367,11 +374,37 @@ static int proc_board_read (char *page, char **start, off_t off,
 }
 
 
+/*
+ * Routine parses and process change request.
+ */
 static int proc_board_write (struct file *file, const char __user *buffer,
 			     unsigned long count, void *data)
 {
-/*	struct klife_board *board = data; */
-	return count;
+	struct klife_board *board = data;
+	change_request_kind_t req;
+	int x, y;
+	char *k_buf;
+	unsigned long ofs = 0;
+
+	k_buf = kmalloc (count, GFP_KERNEL);
+
+	if (!k_buf)
+		return -ENOMEM;
+
+	count -= copy_from_user (k_buf, buffer, count);
+
+	while (parse_change_request (k_buf, count, &ofs, &req, &x, &y)) {
+		switch (req) {
+		case REQ_SET:
+		case REQ_CLEAR:
+		case REQ_TOGGLE:
+			break;
+		}
+	}
+
+	kfree (k_buf);
+
+	return ofs;
 }
 
 
@@ -399,4 +432,24 @@ static inline const char* board_enabled_as_string (int enabled)
 	default:
 		return "1";
 	}
+}
+
+
+/*
+ * Routine parses one request at given position of buffer. If request
+ * is processed, req structure filled and offset is updated.
+ *
+ * Every request occupy one line and can have the form:
+ * 1. set X Y
+ * 2. clear X Y
+ * 3. toggle X Y
+ *
+ * Possible return value:
+ * 1 - request parsed successfully,
+ * 0 - request is invalid and skipped to next line
+ */
+static int parse_change_request (char *data, unsigned long max_ofs, unsigned long *ofs,
+				 change_request_kind_t *req, int *x, int *y)
+{
+	return 0;
 }
