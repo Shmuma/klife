@@ -10,7 +10,7 @@ static struct proc_dir_entry *root;
 static struct proc_dir_entry *boards;
 
 
-static int proc_version_read (char *page, char **start, off_t off, 
+static int proc_version_read (char *page, char **start, off_t off,
 			      int count, int *eof, void *data);
 
 static int proc_status_read (char *page, char **start, off_t off,
@@ -60,7 +60,7 @@ int proc_register (struct klife_status *klife)
 	if (unlikely (!root))
 		goto err;
 
-	version = create_proc_read_entry (KLIFE_PROC_VERSION, 0644, root, 
+	version = create_proc_read_entry (KLIFE_PROC_VERSION, 0644, root,
 					  &proc_version_read, klife);
 	status = create_proc_read_entry (KLIFE_PROC_STATUS, 0644, root,
 					 &proc_status_read, klife);
@@ -119,12 +119,12 @@ static int proc_calc_metrics (char *page, char **start, off_t off,
 }
 
 
-static int proc_version_read (char *page, char **start, off_t off, 
+static int proc_version_read (char *page, char **start, off_t off,
 			      int count, int *eof, void *data)
 {
 	int len;
 
-	len = sprintf (page, "Kernel Life game simulator %d.%d\n", 
+	len = sprintf (page, "Kernel Life game simulator %d.%d\n",
 		       KLIFE_VER_MAJOR, KLIFE_VER_MINOR);
 	return proc_calc_metrics (page, start, off, count, eof, len);
 }
@@ -137,7 +137,7 @@ static int proc_status_read (char *page, char **start, off_t off,
 	struct klife_status *klife = data;
 
 	read_lock (&klife->lock);
-	len = sprintf (page, "Boards: %d\nRunning: %d\nTotal ticks: %llu\n", 
+	len = sprintf (page, "Boards: %d\nRunning: %d\nTotal ticks: %llu\n",
 		       klife->boards_count, klife->boards_running, klife->ticks);
 	read_unlock (&klife->lock);
 
@@ -362,7 +362,7 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 static int proc_board_read (char *page, char **start, off_t off,
 			    int count, int *eof, void *data)
 {
-/* 	struct klife_board *board = data; */
+/*	struct klife_board *board = data; */
 	return 0;
 }
 
@@ -370,7 +370,7 @@ static int proc_board_read (char *page, char **start, off_t off,
 static int proc_board_write (struct file *file, const char __user *buffer,
 			     unsigned long count, void *data)
 {
-/* 	struct klife_board *board = data; */
+/*	struct klife_board *board = data; */
 	return count;
 }
 
