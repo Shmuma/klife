@@ -53,7 +53,8 @@ static char* get_board_index_str (struct klife_board *board);
 static inline const char* board_mode_as_string (klife_board_mode_t mode);
 static inline const char* board_enabled_as_string (int enabled);
 
-static int parse_change_request (char *data, unsigned long max_ofs, unsigned long *ofs, change_request_kind_t *req, int *x, int *y);
+static int parse_change_request (char *data, unsigned long max_ofs, unsigned long *ofs,
+				 change_request_kind_t *req, unsigned long *x, unsigned long *y);
 
 
 /*
@@ -382,7 +383,7 @@ static int proc_board_write (struct file *file, const char __user *buffer,
 {
 	struct klife_board *board = data;
 	change_request_kind_t req;
-	int x, y;
+	unsigned long x, y;
 	char *k_buf;
 	unsigned long ofs = 0;
 
@@ -449,7 +450,28 @@ static inline const char* board_enabled_as_string (int enabled)
  * 0 - request is invalid and skipped to next line
  */
 static int parse_change_request (char *data, unsigned long max_ofs, unsigned long *ofs,
-				 change_request_kind_t *req, int *x, int *y)
+				 change_request_kind_t *req, unsigned long *x, unsigned long *y)
 {
-	return 0;
+	char *p = data + *ofs;
+
+	//	printk (KERN_WARNING "Got data: '%s', length: %lu, ofs: %lu\n", data, max_ofs, *ofs);
+
+	if (strncmp (p, "set ", 4) == 0) {
+		p += 4;
+		*req = REQ_SET;
+		*x = simple_strtoul (p, &p, 10);
+
+		if (*p != ' ')
+			return 0;
+		p++;
+
+		*y = simple_strtoul (p, &p, 10);
+		*ofs = p - data;
+
+		printk (KERN_WARNING "Parsed 'set' request at %lu, %lu\n", *x, *y);
+	}
+	else
+		return 0;
+
+	return 1;
 }
