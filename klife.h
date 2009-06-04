@@ -44,8 +44,21 @@ struct klife_board {
 	int width;
 	int height;
 
-	/* board field's data */
+	/* Board's data. Allocated by whole pages and represents
+	 * nearest square field, where each side is rounded by 8
+	 * bits. This size if saved in field_side.
+	 *
+	 * For example, if pages_count=1, we have 4096 bytes (32768
+	 * bits) which gives us 181x181 field. To make this divisible
+	 * by bytes, we round this field to 176x176. Two pages gives
+	 * us 256x256 field.  */
 	char *field;
+
+	/* amount of pages allocated for board's data */
+	int pages_count;
+
+	/* contain side of square field in bytes */
+	int field_side;
 
 	/* proc parent */
 	struct proc_dir_entry *proc_entry;
