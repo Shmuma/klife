@@ -5,6 +5,21 @@
 #include <linux/slab.h>
 
 
+/*
+ * Internal routines
+ */
+static inline int enlarge_needed (struct klife_board *board, unsigned long x, unsigned long y);
+static int enlarge_field (struct klife_board *board, unsigned int new_side);
+
+
+/*
+ * Internal macroses
+ */
+
+#define CELL_BYTE(x, y, width) (((y)*(width) + x) >> 3)
+#define CELL_MASK(x) ((~0x7) & (x))
+
+
 int klife_create_board (char *name)
 {
 	struct klife_board *board;
@@ -65,6 +80,17 @@ int board_get_cell (struct klife_board *board, unsigned long x, unsigned long y)
 
 int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y)
 {
+	write_lock (&board->lock);
+
+	if (enlarge_needed (board, x, y)) {
+		printk (KERN_INFO "Enlarge needed to process set of cell %lu,%lu\n", x, y);
+		enlarge_field (board, max (x, y) >> 3);
+	}
+
+	board->field[CELL_BYTE (x, y, board->field_side << 3)] |= CELL_MASK (x);
+
+	write_unlock (&board->lock);
+
 	return 0;
 }
 
@@ -78,4 +104,35 @@ int board_clear_cell (struct klife_board *board, unsigned long x, unsigned long 
 int board_toggle_cell (struct klife_board *board, unsigned long x, unsigned long y)
 {
 	return 0;
+}
+
+
+/*
+ * Internal routines
+ */
+
+/*
+ * Routine checks that cell with given coordinates are inside of
+ * allocated board's area. Assume that lock is held at least for reading.
+ */
+static inline int enlarge_needed (struct klife_board *board, unsigned long x, unsigned long y)
+{
+	return board->field_side*8 <= max(x, y);
+}
+
+
+/*
+ * Realloc board's field to make it at least new_side side (in bytes).
+ *
+ * Return 0 if succeeded, -ERROR otherwise.
+ */
+static int enlarge_field (struct klife_board *board, unsigned int new_side)
+{
+/* 	unsigned int size = new_side * new_side; */
+/* 	unsigned int new_pages; */
+/* 	char *new_buf; */
+
+/* 	new_pages = (size + (PAGE_SIZE-1)) / PAGE_SIZE; */
+
+/* 	new_buf = __get_free_pages (__GFP_ZERO | GFP_KERNEL, ); */
 }

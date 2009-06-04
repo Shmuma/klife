@@ -55,10 +55,10 @@ struct klife_board {
 	char *field;
 
 	/* amount of pages allocated for board's data */
-	int pages_count;
+	unsigned int pages_count;
 
 	/* contain side of square field in bytes */
-	int field_side;
+	unsigned int field_side;
 
 	/* proc parent */
 	struct proc_dir_entry *proc_entry;
