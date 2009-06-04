@@ -55,6 +55,13 @@ struct klife_board {
 int klife_create_board (char *name);
 int klife_delete_board (struct klife_board *board);
 
+
+/* Board's cell management */
+int board_get_cell (struct klife_board *board, unsigned long x, unsigned long y);
+int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y);
+int board_clear_cell (struct klife_board *board, unsigned long x, unsigned long y);
+int board_toggle_cell (struct klife_board *board, unsigned long x, unsigned long y);
+
 extern struct klife_status klife;
 
 #endif

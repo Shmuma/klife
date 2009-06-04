@@ -56,3 +56,30 @@ int klife_delete_board (struct klife_board *board)
 
 	return 0;
 }
+
+
+/*
+ * Board management routines
+ */
+int board_get_cell (struct klife_board *board, unsigned long x, unsigned long y)
+{
+	return 0;
+}
+
+
+int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y)
+{
+	return 0;
+}
+
+
+int board_clear_cell (struct klife_board *board, unsigned long x, unsigned long y)
+{
+	return 0;
+}
+
+
+int board_toggle_cell (struct klife_board *board, unsigned long x, unsigned long y)
+{
+	return 0;
+}

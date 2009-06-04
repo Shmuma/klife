@@ -393,13 +393,20 @@ static int proc_board_write (struct file *file, const char __user *buffer,
 	if (!k_buf)
 		return -ENOMEM;
 
+	x = y = 0;
+	req = REQ_SET;
 	count -= copy_from_user (k_buf, buffer, count);
 
 	while (parse_change_request (k_buf, count, &ofs, &req, &x, &y)) {
 		switch (req) {
 		case REQ_SET:
+			board_set_cell (board, x, y);
+			break;
 		case REQ_CLEAR:
+			board_clear_cell (board, x, y);
+			break;
 		case REQ_TOGGLE:
+			board_toggle_cell (board, x, y);
 			break;
 		}
 	}
@@ -501,7 +508,7 @@ static int parse_change_request (char *data, unsigned long max_ofs, unsigned lon
 			*y = simple_strtoul (p, &p, 10);
 			*ofs = p - data;
 
-			printk (KERN_INFO "Parsed %scommand, X=%lu, Y=%lu\n", table[i].cmd, *x, *y);
+			printk (KERN_INFO "Parsed %s (%lu, %lu)\n", table[i].cmd, *x, *y);
 			ret = 1;
 		}
 	}
