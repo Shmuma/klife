@@ -2,6 +2,7 @@
 #include <linux/proc_fs.h>
 #include <linux/uaccess.h>
 #include <linux/string.h>
+#include <linux/ctype.h>
 
 #include "klife.h"
 #include "klife-proc.h"
@@ -437,6 +438,22 @@ static inline const char* board_enabled_as_string (int enabled)
 
 
 /*
+ * Skip spaces in buffer, Returns 1 if faced with non-space character,
+ * or 0 if we faced the end of the buffer */
+static inline int skip_spaces (char **p, const char *max_p)
+{
+	while (*p != max_p && isspace (**p)) {
+		++(*p);
+	}
+
+	if (*p == max_p)
+		return 0;
+	else
+		return 1;
+}
+
+
+/*
  * Routine parses one request at given position of buffer. If request
  * is processed, req structure filled and offset is updated.
  *
@@ -452,26 +469,38 @@ static inline const char* board_enabled_as_string (int enabled)
 static int parse_change_request (char *data, unsigned long max_ofs, unsigned long *ofs,
 				 change_request_kind_t *req, unsigned long *x, unsigned long *y)
 {
+	int ret = 0;
 	char *p = data + *ofs;
 
 	//	printk (KERN_WARNING "Got data: '%s', length: %lu, ofs: %lu\n", data, max_ofs, *ofs);
+	if (!skip_spaces (&p, data + max_ofs))
+		goto finish;
 
 	if (strncmp (p, "set ", 4) == 0) {
 		p += 4;
+
+		if (!skip_spaces (&p, data + max_ofs))
+			goto finish;
+
 		*req = REQ_SET;
 		*x = simple_strtoul (p, &p, 10);
 
-		if (*p != ' ')
-			return 0;
-		p++;
+		if (!skip_spaces (&p, data + max_ofs))
+			goto finish;
 
 		*y = simple_strtoul (p, &p, 10);
 		*ofs = p - data;
 
 		printk (KERN_WARNING "Parsed 'set' request at %lu, %lu\n", *x, *y);
+		ret = 1;
 	}
-	else
-		return 0;
 
-	return 1;
+ finish:
+	/* search for newline or end of buffer */
+	while (p != data + max_ofs && *p != '\n')
+		p++;
+
+	*ofs = p - data;
+
+	return ret;
 }
