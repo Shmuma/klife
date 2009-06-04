@@ -491,7 +491,42 @@ static int parse_change_request (char *data, unsigned long max_ofs, unsigned lon
 		*y = simple_strtoul (p, &p, 10);
 		*ofs = p - data;
 
-		printk (KERN_WARNING "Parsed 'set' request at %lu, %lu\n", *x, *y);
+		printk (KERN_INFO "Parsed 'set' request at %lu, %lu\n", *x, *y);
+		ret = 1;
+	}
+	else if (strncmp (p, "clear ", 6) == 0) {
+		p += 6;
+
+		if (!skip_spaces (&p, data + max_ofs))
+			goto finish;
+
+		*req = REQ_CLEAR;
+		*x = simple_strtoul (p, &p, 10);
+
+		if (!skip_spaces (&p, data + max_ofs))
+			goto finish;
+
+		*y = simple_strtoul (p, &p, 10);
+		*ofs = p - data;
+
+		printk (KERN_INFO "Parsed 'clear' request at %lu, %lu\n", *x, *y);
+		ret = 1;
+	} else if (strncmp (p, "toggle ", 7) == 0) {
+		p += 7;
+
+		if (!skip_spaces (&p, data + max_ofs))
+			goto finish;
+
+		*req = REQ_TOGGLE;
+		*x = simple_strtoul (p, &p, 10);
+
+		if (!skip_spaces (&p, data + max_ofs))
+			goto finish;
+
+		*y = simple_strtoul (p, &p, 10);
+		*ofs = p - data;
+
+		printk (KERN_WARNING "Parsed 'toggle' request at %lu, %lu\n", *x, *y);
 		ret = 1;
 	}
 
