@@ -469,65 +469,41 @@ static inline int skip_spaces (char **p, const char *max_p)
 static int parse_change_request (char *data, unsigned long max_ofs, unsigned long *ofs,
 				 change_request_kind_t *req, unsigned long *x, unsigned long *y)
 {
-	int ret = 0;
+	static const struct {
+		const char* cmd;
+		change_request_kind_t kind;
+	} table[] = {
+		{ .cmd = "set ", .kind = REQ_SET },
+		{ .cmd = "clear ", .kind = REQ_SET },
+		{ .cmd = "toggle ", .kind = REQ_SET },
+	};
+
+	int ret = 0, i, len;
 	char *p = data + *ofs;
 
-	//	printk (KERN_WARNING "Got data: '%s', length: %lu, ofs: %lu\n", data, max_ofs, *ofs);
+
 	if (!skip_spaces (&p, data + max_ofs))
 		goto finish;
 
-	if (strncmp (p, "set ", 4) == 0) {
-		p += 4;
+	for (i = 0; i < sizeof(table) / sizeof(table[0]) && !ret; i++) {
+		len = strlen (table[i].cmd);
+		if (strncmp (p, table[i].cmd, len) == 0) {
+			p += len;
+			if (!skip_spaces (&p, data + max_ofs))
+				goto finish;
 
-		if (!skip_spaces (&p, data + max_ofs))
-			goto finish;
+			*req = table[i].kind;
+			*x = simple_strtoul (p, &p, 10);
 
-		*req = REQ_SET;
-		*x = simple_strtoul (p, &p, 10);
+			if (!skip_spaces (&p, data + max_ofs))
+				goto finish;
 
-		if (!skip_spaces (&p, data + max_ofs))
-			goto finish;
+			*y = simple_strtoul (p, &p, 10);
+			*ofs = p - data;
 
-		*y = simple_strtoul (p, &p, 10);
-		*ofs = p - data;
-
-		printk (KERN_INFO "Parsed 'set' request at %lu, %lu\n", *x, *y);
-		ret = 1;
-	}
-	else if (strncmp (p, "clear ", 6) == 0) {
-		p += 6;
-
-		if (!skip_spaces (&p, data + max_ofs))
-			goto finish;
-
-		*req = REQ_CLEAR;
-		*x = simple_strtoul (p, &p, 10);
-
-		if (!skip_spaces (&p, data + max_ofs))
-			goto finish;
-
-		*y = simple_strtoul (p, &p, 10);
-		*ofs = p - data;
-
-		printk (KERN_INFO "Parsed 'clear' request at %lu, %lu\n", *x, *y);
-		ret = 1;
-	} else if (strncmp (p, "toggle ", 7) == 0) {
-		p += 7;
-
-		if (!skip_spaces (&p, data + max_ofs))
-			goto finish;
-
-		*req = REQ_TOGGLE;
-		*x = simple_strtoul (p, &p, 10);
-
-		if (!skip_spaces (&p, data + max_ofs))
-			goto finish;
-
-		*y = simple_strtoul (p, &p, 10);
-		*ofs = p - data;
-
-		printk (KERN_WARNING "Parsed 'toggle' request at %lu, %lu\n", *x, *y);
-		ret = 1;
+			printk (KERN_INFO "Parsed %scommand, X=%lu, Y=%lu\n", table[i].cmd, *x, *y);
+			ret = 1;
+		}
 	}
 
  finish:
