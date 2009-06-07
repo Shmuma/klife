@@ -44,18 +44,18 @@ struct klife_board {
 	int width;
 	int height;
 
-	/* Board's data. Allocated by whole pages and represents
+	/* Board's data. Allocated by 2^n pages and represents
 	 * nearest square field, where each side is rounded by 8
 	 * bits. This size if saved in field_side.
 	 *
-	 * For example, if pages_count=1, we have 4096 bytes (32768
-	 * bits) which gives us 181x181 field. To make this divisible
-	 * by bytes, we round this field to 176x176. Two pages gives
-	 * us 256x256 field.  */
+	 * For example, if pages_power=1, we have 4096 bytes (32768 bits) which gives us 181x181
+	 * field. To make this divisible by bytes, we round this field to 176x176. Two pages gives
+	 * us 256x256 field. Of course, the above calculations is correct for x86 arch. For
+	 * different page sizes, we can have more or less field sizes */
 	char *field;
 
-	/* amount of pages allocated for board's data */
-	unsigned int pages_count;
+	/* represents 2^X pages allocated */
+	unsigned int pages_power;
 
 	/* contain side of square field in bytes */
 	unsigned int field_side;

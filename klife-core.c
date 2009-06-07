@@ -10,6 +10,7 @@
  */
 static inline int enlarge_needed (struct klife_board *board, unsigned long x, unsigned long y);
 static int enlarge_field (struct klife_board *board, unsigned int new_side);
+static inline unsigned int get_field_side (unsigned int pages_power);
 
 
 /*
@@ -34,6 +35,12 @@ int klife_create_board (char *name)
 	board->index = klife.next_index;
 	board->lock = RW_LOCK_UNLOCKED;
 	board->mode = KBM_STEP;
+
+	/* allocate one page for our board */
+	board->field = (char*)__get_free_page (__GFP_ZERO | GFP_KERNEL);
+	board->field_side = get_field_side (0);
+	board->pages_power = 0;
+
 	INIT_LIST_HEAD (&board->next);
 	list_add (&board->next, &klife.boards);
 	if (proc_create_board (board))
@@ -63,6 +70,7 @@ int klife_delete_board (struct klife_board *board)
 
 	write_lock (&board->lock);
 	proc_delete_board (board);
+	free_pages ((unsigned long)board->field, board->pages_power);
 	write_unlock (&board->lock);
 
 	return 0;
@@ -122,17 +130,93 @@ static inline int enlarge_needed (struct klife_board *board, unsigned long x, un
 
 
 /*
- * Realloc board's field to make it at least new_side side (in bytes).
+ * Realloc board's field to make it at least new_side side (in bytes). Write lock must be held.
  *
  * Return 0 if succeeded, -ERROR otherwise.
  */
 static int enlarge_field (struct klife_board *board, unsigned int new_side)
 {
-/* 	unsigned int size = new_side * new_side; */
-/* 	unsigned int new_pages; */
-/* 	char *new_buf; */
+	unsigned int pages = (new_side * new_side) / PAGE_SIZE;
+	unsigned int new_power, tmp, new_side_actual;
+	char *new_buf;
 
-/* 	new_pages = (size + (PAGE_SIZE-1)) / PAGE_SIZE; */
+	/* We know needed amount of pages to provide required board side, but we must find nearest
+	 * greater 2^X. */
+	new_power = 0;
+	tmp = 1;
+	while (tmp < pages) {
+		new_power++;
+		tmp <<= 1;
+	}
 
-/* 	new_buf = __get_free_pages (__GFP_ZERO | GFP_KERNEL, ); */
+	new_side_actual = get_field_side (new_power);
+
+	printk (KERN_INFO "Enlarge field (requested side %u). %llu pages -> %llu pages. Result side %u\n",
+		new_side, 1ULL << board->pages_power, 1ULL << new_power, new_side_actual);
+
+	new_buf = (char*)__get_free_pages (__GFP_ZERO | GFP_KERNEL, new_power);
+
+	if (unlikely (!new_buf))
+		return -ENOMEM;
+
+	/* now we must move existing data */
+
+	/* ok, free old board */
+	free_pages ((unsigned long)board->field, board->pages_power);
+
+	board->field = new_buf;
+	board->pages_power = new_power;
+	board->field_side = new_side_actual;
+
+	return 0;
+}
+
+
+
+/*
+ * Routine calculates side of field which have 2^pages_power pages allocated.
+ *
+ * It calculates integer square root of 2^pages_power*PAGE_SIZE. Algorithm is borrowed from this
+ * book: Henry S. Warren. Hacker's delight.
+ */
+#define UPDATE_APPROX(n1, s, bits)			\
+	do {						\
+		if (n1 > ((1ULL << bits) - 1)) {	\
+			s += bits >> 1;			\
+			n1 >>= bits;			\
+		}					\
+	} while (0);
+
+
+static inline unsigned int get_field_side (unsigned int pages_power)
+{
+	unsigned long n = (1UL << pages_power) * PAGE_SIZE;
+	unsigned int s, g0, g1;
+	unsigned long n1;
+
+	BUG_ON (pages_power+PAGE_SHIFT > 32);
+
+	printk (KERN_DEBUG "get_field_side: n = %lu, let's calculate isqrt of it\n", n);
+
+	n1 = n - 1;
+	s = 1;
+	UPDATE_APPROX (n1, s, 16);
+	UPDATE_APPROX (n1, s, 8);
+	UPDATE_APPROX (n1, s, 4);
+	UPDATE_APPROX (n1, s, 2);
+
+	g0 = 1 << s;
+	g1 = (g0 + (n >> s)) >> 1;
+
+	printk (KERN_DEBUG "n1 = %lu, s = %u, g0 = %u, g1 = %u\n", n1, s, g0, g1);
+
+	while (g1 < g0) {
+		g0 = g1;
+		g1 = (g0 + (n / g0)) >> 1;
+		printk (KERN_DEBUG "g0 = %u, g1 = %u\n", g0, g1);
+	}
+
+	printk (KERN_DEBUG "Result is %u\n", g0);
+
+	return g0;
 }

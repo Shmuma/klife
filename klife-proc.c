@@ -360,8 +360,12 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 	int len;
 
 	read_lock (&board->lock);
-	len = snprintf (page, count, "Mode:\t\t%s\nEnabled:\t%s\nWidth:\t\t%d\nHeight:\t\t%d\n", board_mode_as_string (board->mode),
-			board->enabled ? "yes" : "no", board->width, board->height);
+	len = snprintf (page, count, "Mode:\t\t%s\nEnabled:\t%s\nWidth:\t\t%d\nHeight:\t\t%d\nAlloc side:\t%u\nPages:\t\t%llu\n",
+			board_mode_as_string (board->mode),
+			board->enabled ? "yes" : "no",
+			board->width, board->height,
+			board->field_side,
+			1ULL << board->pages_power);
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);
