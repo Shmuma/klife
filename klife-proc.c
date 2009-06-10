@@ -365,7 +365,7 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 			board->enabled ? "yes" : "no",
 			board->width, board->height,
 			board->field_side,
-			1ULL << board->pages_power);
+			board->field ? (1ULL << board->pages_power) : 0);
 	read_unlock (&board->lock);
 
 	return proc_calc_metrics (page, start, off, count, eof, len);

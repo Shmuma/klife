@@ -54,7 +54,8 @@ struct klife_board {
 	 * different page sizes, we can have more or less field sizes */
 	char *field;
 
-	/* represents 2^X pages allocated */
+	/* represents 2^X pages allocated, but only if field is not null. If it is null, pages_power
+	 * must be zero, which represents zero pages. */
 	unsigned int pages_power;
 
 	/* contain side of square field in bytes */

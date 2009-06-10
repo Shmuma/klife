@@ -37,11 +37,6 @@ int klife_create_board (char *name)
 	board->lock = RW_LOCK_UNLOCKED;
 	board->mode = KBM_STEP;
 
-	/* allocate one page for our board */
-	board->field = (char*)__get_free_page (__GFP_ZERO | GFP_KERNEL);
-	board->field_side = get_field_side (0);
-	board->pages_power = 0;
-
 	INIT_LIST_HEAD (&board->next);
 	list_add (&board->next, &klife.boards);
 	if (proc_create_board (board))
@@ -89,14 +84,17 @@ int board_get_cell (struct klife_board *board, unsigned long x, unsigned long y)
 
 int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y)
 {
+	int ret = 0;
+
 	write_lock (&board->lock);
 
 	if (enlarge_needed (board, x, y)) {
 		printk (KERN_INFO "Enlarge needed to process set of cell %lu,%lu\n", x, y);
-		enlarge_field (board, max (x, y) >> 3);
+		ret = enlarge_field (board, (max (x, y) + 8) >> 3);
 	}
 
-	board->field[CELL_BYTE (x, y, board->field_side << 3)] |= CELL_MASK (x);
+	if (!ret)
+		board->field[CELL_BYTE (x, y, board->field_side << 3)] |= CELL_MASK (x);
 
 	write_unlock (&board->lock);
 
@@ -137,7 +135,7 @@ static inline int enlarge_needed (struct klife_board *board, unsigned long x, un
  */
 static int enlarge_field (struct klife_board *board, unsigned int new_side)
 {
-	unsigned int pages = (new_side * new_side) / PAGE_SIZE;
+	unsigned int pages = (new_side * new_side + PAGE_SIZE - 1) / PAGE_SIZE;
 	unsigned int new_power, tmp, new_side_actual;
 	char *new_buf;
 
@@ -153,18 +151,19 @@ static int enlarge_field (struct klife_board *board, unsigned int new_side)
 	new_side_actual = get_field_side (new_power);
 
 	printk (KERN_INFO "Enlarge field (requested side %u). %llu pages -> %llu pages. Result side %u\n",
-		new_side, 1ULL << board->pages_power, 1ULL << new_power, new_side_actual);
+		new_side, board->field ? (1ULL << board->pages_power) : 0, 1ULL << new_power, new_side_actual);
 
 	new_buf = (char*)__get_free_pages (__GFP_ZERO | GFP_KERNEL, new_power);
 
 	if (unlikely (!new_buf))
 		return -ENOMEM;
 
-	/* now we must move existing data */
-	copy_field (board->field, board->field_side, new_buf, new_side_actual);
-
-	/* ok, free old board */
-	free_pages ((unsigned long)board->field, board->pages_power);
+	if (board->field) {
+		/* now we must move existing data */
+		copy_field (board->field, board->field_side, new_buf, new_side_actual);
+		/* ok, free old board */
+		free_pages ((unsigned long)board->field, board->pages_power);
+	}
 
 	board->field = new_buf;
 	board->pages_power = new_power;
