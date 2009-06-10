@@ -11,6 +11,7 @@
 static inline int enlarge_needed (struct klife_board *board, unsigned long x, unsigned long y);
 static int enlarge_field (struct klife_board *board, unsigned int new_side);
 static inline unsigned int get_field_side (unsigned int pages_power);
+static void copy_field (char *src, unsigned int src_side, char *dst, unsigned int dst_side);
 
 
 /*
@@ -160,6 +161,7 @@ static int enlarge_field (struct klife_board *board, unsigned int new_side)
 		return -ENOMEM;
 
 	/* now we must move existing data */
+	copy_field (board->field, board->field_side, new_buf, new_side_actual);
 
 	/* ok, free old board */
 	free_pages ((unsigned long)board->field, board->pages_power);
@@ -196,7 +198,7 @@ static inline unsigned int get_field_side (unsigned int pages_power)
 
 	BUG_ON (pages_power+PAGE_SHIFT > 32);
 
-	printk (KERN_DEBUG "get_field_side: n = %lu, let's calculate isqrt of it\n", n);
+	pr_debug ("get_field_side: n = %lu, let's calculate isqrt of it\n", n);
 
 	n1 = n - 1;
 	s = 1;
@@ -208,15 +210,28 @@ static inline unsigned int get_field_side (unsigned int pages_power)
 	g0 = 1 << s;
 	g1 = (g0 + (n >> s)) >> 1;
 
-	printk (KERN_DEBUG "n1 = %lu, s = %u, g0 = %u, g1 = %u\n", n1, s, g0, g1);
+	pr_debug ("n1 = %lu, s = %u, g0 = %u, g1 = %u\n", n1, s, g0, g1);
 
 	while (g1 < g0) {
 		g0 = g1;
 		g1 = (g0 + (n / g0)) >> 1;
-		printk (KERN_DEBUG "g0 = %u, g1 = %u\n", g0, g1);
+		pr_debug ("g0 = %u, g1 = %u\n", g0, g1);
 	}
 
-	printk (KERN_DEBUG "Result is %u\n", g0);
+	pr_debug ("Result is %u\n", g0);
 
 	return g0;
+}
+
+
+/*
+ * Copy field data from source to dest, take in attention that dest is larger than src.
+ * Dest is already filled with zeroes.
+ */
+static void copy_field (char *src, unsigned int src_side, char *dst, unsigned int dst_side)
+{
+	unsigned int x;
+
+	for (x = 0; x < src_side; x++)
+		memcpy (dst + x * dst_side, src + x * src_side, src_side);
 }

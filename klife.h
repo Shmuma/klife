@@ -41,8 +41,8 @@ struct klife_board {
 	int enabled;
 
 	/* board dimensions */
-	int width;
-	int height;
+	unsigned int width;
+	unsigned int height;
 
 	/* Board's data. Allocated by 2^n pages and represents
 	 * nearest square field, where each side is rounded by 8
