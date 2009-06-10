@@ -78,7 +78,19 @@ int klife_delete_board (struct klife_board *board)
  */
 int board_get_cell (struct klife_board *board, unsigned long x, unsigned long y)
 {
-	return 0;
+	int res;
+
+	read_lock (&board->lock);
+
+	if (max (x, y) > board->field_side << 3)
+		return -EINVAL;
+
+	res = board->field[CELL_BYTE (x, y, board->field_side << 3)] & CELL_MASK (x);
+	res = res ? 1 : 0;
+
+	read_unlock (&board->lock);
+
+	return res;
 }
 
 
@@ -104,12 +116,40 @@ int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y)
 
 int board_clear_cell (struct klife_board *board, unsigned long x, unsigned long y)
 {
+	int ret = 0;
+
+	write_lock (&board->lock);
+
+	if (enlarge_needed (board, x, y)) {
+		printk (KERN_INFO "Enlarge needed to process set of cell %lu,%lu\n", x, y);
+		ret = enlarge_field (board, (max (x, y) + 8) >> 3);
+	}
+
+	if (!ret)
+		board->field[CELL_BYTE (x, y, board->field_side << 3)] &= ~CELL_MASK (x);
+
+	write_unlock (&board->lock);
+
 	return 0;
 }
 
 
 int board_toggle_cell (struct klife_board *board, unsigned long x, unsigned long y)
 {
+	int ret = 0;
+
+	write_lock (&board->lock);
+
+	if (enlarge_needed (board, x, y)) {
+		printk (KERN_INFO "Enlarge needed to process set of cell %lu,%lu\n", x, y);
+		ret = enlarge_field (board, (max (x, y) + 8) >> 3);
+	}
+
+	if (!ret)
+		board->field[CELL_BYTE (x, y, board->field_side << 3)] ^= CELL_MASK (x);
+
+	write_unlock (&board->lock);
+
 	return 0;
 }
 
