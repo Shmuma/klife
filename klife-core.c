@@ -17,9 +17,8 @@ static void copy_field (char *src, unsigned int src_side, char *dst, unsigned in
 /*
  * Internal macroses
  */
-
 #define CELL_BYTE(x, y, width) (((y)*(width) + x) >> 3)
-#define CELL_MASK(x) ((~0x7) & (x))
+#define CELL_MASK(x) (1UL << ((x) & 0x7))
 
 
 int klife_create_board (char *name)
@@ -105,8 +104,14 @@ int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y)
 		ret = enlarge_field (board, (max (x, y) + 8) >> 3);
 	}
 
-	if (!ret)
+	if (!ret) {
+		/* check for side change */
+		if (board->side < max (x, y))
+			board->side = max (x, y) + 1;
+
+/* 		printk (KERN_INFO "%lu,%lu, ofs = %lu, mask = %lx\n", x, y, CELL_BYTE (x, y, board->field_side << 3), CELL_MASK (x)); */
 		board->field[CELL_BYTE (x, y, board->field_side << 3)] |= CELL_MASK (x);
+	}
 
 	write_unlock (&board->lock);
 
@@ -273,4 +278,35 @@ static void copy_field (char *src, unsigned int src_side, char *dst, unsigned in
 
 	for (x = 0; x < src_side; x++)
 		memcpy (dst + x * dst_side, src + x * src_side, src_side);
+}
+
+
+
+/* Debug helpers */
+void klife_dump_board (struct klife_board *board)
+{
+	unsigned long i, lim;
+
+	read_lock (&board->lock);
+	printk (KERN_INFO "\nKlife debug dump of board '%s', side %d:\n", board->name, board->field_side);
+
+	printk (KERN_INFO "Field: ");
+
+	if (!board->field)
+		printk ("empty\n");
+	else {
+		printk ("\n");
+
+		lim = (1UL << board->pages_power) * PAGE_SIZE;
+
+		for (i = 0; i < lim; i++) {
+			printk ("%02x ", (int)board->field[i]);
+			if ((i+1) % board->field_side == 0)
+				printk ("\n" KERN_INFO);
+		}
+
+		printk ("\n");
+	}
+
+	read_unlock (&board->lock);
 }

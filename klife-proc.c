@@ -360,10 +360,10 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 	int len;
 
 	read_lock (&board->lock);
-	len = snprintf (page, count, "Mode:\t\t%s\nEnabled:\t%s\nWidth:\t\t%d\nHeight:\t\t%d\nAlloc side:\t%u\nPages:\t\t%llu\n",
+	len = snprintf (page, count, "Mode:\t\t%s\nEnabled:\t%s\nSide:\t\t%d\nAlloc side:\t%u\nPages:\t\t%llu\n",
 			board_mode_as_string (board->mode),
 			board->enabled ? "yes" : "no",
-			board->width, board->height,
+			board->side,
 			board->field_side,
 			board->field ? (1ULL << board->pages_power) : 0);
 	read_unlock (&board->lock);
@@ -375,8 +375,50 @@ static int proc_board_status_read (char *page, char **start, off_t off,
 static int proc_board_read (char *page, char **start, off_t off,
 			    int count, int *eof, void *data)
 {
-/*	struct klife_board *board = data; */
-	return 0;
+	struct klife_board *board = data;
+	int x, y;
+	int val;
+	char *p = page;
+
+	*start = p;
+
+	/* calculate starting point to dump board */
+	x = off % (board->side + 1);
+	y = off / (board->side + 1);
+
+	printk (KERN_INFO "%d, %lu, %d, %d\n", count, off, x, y);
+
+	if (y >= board->side) {
+		*eof = 1;
+		return 0;
+	}
+
+	while (y < board->side) {
+		printk (KERN_INFO "fill line %d of %d\n", y, board->side);
+		while (x < board->side) {
+			val = board_get_cell (board, x, y);
+			*p = val ? '#' : '.';
+			p++;
+			x++;
+			count--;
+			if (count <= 0)
+				goto finish;
+		}
+
+		*p = '\n';
+		p++;
+		count--;
+		x = 0;
+		y++;
+		if (count <= 0)
+			goto finish;
+	}
+
+	*eof = 1;
+
+finish:
+	printk (KERN_INFO "Filled %ld bytes\n", p - page);
+	return p - page;
 }
 
 

@@ -40,9 +40,8 @@ struct klife_board {
 	klife_board_mode_t mode;
 	int enabled;
 
-	/* board dimensions */
-	unsigned int width;
-	unsigned int height;
+	/* board dimension side x side */
+	unsigned int side;
 
 	/* Board's data. Allocated by 2^n pages and represents
 	 * nearest square field, where each side is rounded by 8
@@ -68,6 +67,9 @@ struct klife_board {
 
 int klife_create_board (char *name);
 int klife_delete_board (struct klife_board *board);
+
+/* debug helpers */
+void klife_dump_board (struct klife_board *board);
 
 
 /* Board's cell management */
