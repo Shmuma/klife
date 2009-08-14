@@ -386,15 +386,12 @@ static int proc_board_read (char *page, char **start, off_t off,
 	x = off % (board->side + 1);
 	y = off / (board->side + 1);
 
-	printk (KERN_INFO "%d, %lu, %d, %d\n", count, off, x, y);
-
 	if (y >= board->side) {
 		*eof = 1;
 		return 0;
 	}
 
 	while (y < board->side) {
-		printk (KERN_INFO "fill line %d of %d\n", y, board->side);
 		while (x < board->side) {
 			val = board_get_cell (board, x, y);
 			*p = val ? '#' : '.';
@@ -417,7 +414,6 @@ static int proc_board_read (char *page, char **start, off_t off,
 	*eof = 1;
 
 finish:
-	printk (KERN_INFO "Filled %ld bytes\n", p - page);
 	return p - page;
 }
 

@@ -28,6 +28,8 @@ typedef enum {
 } klife_board_mode_t;
 
 
+
+/* Board is 2^x pages which represents square of bits */
 struct klife_board {
 	rwlock_t lock;
 	struct list_head next;
@@ -40,7 +42,7 @@ struct klife_board {
 	klife_board_mode_t mode;
 	int enabled;
 
-	/* board dimension side x side */
+	/* board dimension in bits (board is square) */
 	unsigned int side;
 
 	/* Board's data. Allocated by 2^n pages and represents
@@ -57,7 +59,7 @@ struct klife_board {
 	 * must be zero, which represents zero pages. */
 	unsigned int pages_power;
 
-	/* contain side of square field in bytes */
+	/* contain side of square field (allocated) in bits */
 	unsigned int field_side;
 
 	/* proc parent */

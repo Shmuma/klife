@@ -81,10 +81,10 @@ int board_get_cell (struct klife_board *board, unsigned long x, unsigned long y)
 
 	read_lock (&board->lock);
 
-	if (max (x, y) > board->field_side << 3)
+	if (max (x, y) > board->side)
 		return -EINVAL;
 
-	res = board->field[CELL_BYTE (x, y, board->field_side << 3)] & CELL_MASK (x);
+	res = board->field[CELL_BYTE (x, y, board->field_side)] & CELL_MASK (x);
 	res = res ? 1 : 0;
 
 	read_unlock (&board->lock);
@@ -101,7 +101,7 @@ int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y)
 
 	if (enlarge_needed (board, x, y)) {
 		printk (KERN_INFO "Enlarge needed to process set of cell %lu,%lu\n", x, y);
-		ret = enlarge_field (board, (max (x, y) + 8) >> 3);
+		ret = enlarge_field (board, max (x, y));
 	}
 
 	if (!ret) {
@@ -110,7 +110,7 @@ int board_set_cell (struct klife_board *board, unsigned long x, unsigned long y)
 			board->side = max (x, y) + 1;
 
 /* 		printk (KERN_INFO "%lu,%lu, ofs = %lu, mask = %lx\n", x, y, CELL_BYTE (x, y, board->field_side << 3), CELL_MASK (x)); */
-		board->field[CELL_BYTE (x, y, board->field_side << 3)] |= CELL_MASK (x);
+		board->field[CELL_BYTE (x, y, board->field_side)] |= CELL_MASK (x);
 	}
 
 	write_unlock (&board->lock);
@@ -127,11 +127,11 @@ int board_clear_cell (struct klife_board *board, unsigned long x, unsigned long 
 
 	if (enlarge_needed (board, x, y)) {
 		printk (KERN_INFO "Enlarge needed to process set of cell %lu,%lu\n", x, y);
-		ret = enlarge_field (board, (max (x, y) + 8) >> 3);
+		ret = enlarge_field (board, max (x, y));
 	}
 
 	if (!ret)
-		board->field[CELL_BYTE (x, y, board->field_side << 3)] &= ~CELL_MASK (x);
+		board->field[CELL_BYTE (x, y, board->field_side)] &= ~CELL_MASK (x);
 
 	write_unlock (&board->lock);
 
@@ -147,11 +147,11 @@ int board_toggle_cell (struct klife_board *board, unsigned long x, unsigned long
 
 	if (enlarge_needed (board, x, y)) {
 		printk (KERN_INFO "Enlarge needed to process set of cell %lu,%lu\n", x, y);
-		ret = enlarge_field (board, (max (x, y) + 8) >> 3);
+		ret = enlarge_field (board, max (x, y));
 	}
 
 	if (!ret)
-		board->field[CELL_BYTE (x, y, board->field_side << 3)] ^= CELL_MASK (x);
+		board->field[CELL_BYTE (x, y, board->field_side)] ^= CELL_MASK (x);
 
 	write_unlock (&board->lock);
 
@@ -169,20 +169,23 @@ int board_toggle_cell (struct klife_board *board, unsigned long x, unsigned long
  */
 static inline int enlarge_needed (struct klife_board *board, unsigned long x, unsigned long y)
 {
-	return board->field_side*8 <= max(x, y);
+	return board->field_side <= max(x, y);
 }
 
 
 /*
- * Realloc board's field to make it at least new_side side (in bytes). Write lock must be held.
+ * Realloc board's field to make it at least new_side side (in bits). Write lock must be held.
  *
  * Return 0 if succeeded, -ERROR otherwise.
  */
 static int enlarge_field (struct klife_board *board, unsigned int new_side)
 {
-	unsigned int pages = (new_side * new_side + PAGE_SIZE - 1) / PAGE_SIZE;
-	unsigned int new_power, tmp, new_side_actual;
+	unsigned int pages;
+	unsigned int new_bytes, new_power, tmp, new_side_actual;
 	char *new_buf;
+
+	new_bytes = (new_side + 7) >> 3;
+	pages = (new_bytes * (new_bytes << 3) + PAGE_SIZE - 1) / PAGE_SIZE;
 
 	/* We know needed amount of pages to provide required board side, but we must find nearest
 	 * greater 2^X. */
@@ -200,12 +203,14 @@ static int enlarge_field (struct klife_board *board, unsigned int new_side)
 
 	new_buf = (char*)__get_free_pages (__GFP_ZERO | GFP_KERNEL, new_power);
 
-	if (unlikely (!new_buf))
+	if (unlikely (!new_buf)) {
+		printk (KERN_WARNING "Failed to allocate %llu pages\n", 1ULL << new_power);
 		return -ENOMEM;
+	}
 
 	if (board->field) {
 		/* now we must move existing data */
-		copy_field (board->field, board->field_side, new_buf, new_side_actual);
+		copy_field (board->field, board->field_side >> 3, new_buf, new_side_actual >> 3);
 		/* ok, free old board */
 		free_pages ((unsigned long)board->field, board->pages_power);
 	}
@@ -241,6 +246,7 @@ static inline unsigned int get_field_side (unsigned int pages_power)
 	unsigned long n1;
 
 	BUG_ON (pages_power+PAGE_SHIFT > 32);
+	n <<= 3;
 
 	pr_debug ("get_field_side: n = %lu, let's calculate isqrt of it\n", n);
 
@@ -262,6 +268,8 @@ static inline unsigned int get_field_side (unsigned int pages_power)
 		pr_debug ("g0 = %u, g1 = %u\n", g0, g1);
 	}
 
+	/* ok, we got isqrt of n in bits, but we must round this down to nearest byte */
+	g0 = (g0 >> 3) << 3;
 	pr_debug ("Result is %u\n", g0);
 
 	return g0;
@@ -301,7 +309,7 @@ void klife_dump_board (struct klife_board *board)
 
 		for (i = 0; i < lim; i++) {
 			printk ("%02x ", (int)board->field[i]);
-			if ((i+1) % board->field_side == 0)
+			if ((i+1) % (board->field_side >> 3) == 0)
 				printk ("\n" KERN_INFO);
 		}
 
